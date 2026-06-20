@@ -87,12 +87,13 @@
   </div>
 
   <div class="panel">
-    <h3>Замена фона <small>— главное против «фото из интернета»</small></h3>
-    <div class="ctl"><label>Вырезать предмет и сменить фон<small>первая обработка грузит модель ~5 сек, дальше быстро</small></label>
-      <span class="sw"><input type="checkbox" id="bg" checked><span></span></span></div>
-    <div class="ctl"><label>Растушёвка края<small>сглаживает зубцы по контуру, прячет артефакты</small></label>
-      <input type="range" id="feather" min="0" max="6" value="2"></div>
+    <h3>Сдвиг фона <small>— быстро, против «фото из интернета»</small></h3>
+    <div class="ctl"><label>Тонировка<small>лёгкий цветовой оттенок поверх всего кадра</small></label>
+      <input type="range" id="tint" min="0" max="14" value="6"></div>
+    <div class="ctl"><label>Размытие краёв кадра<small>смягчает фон по периметру, ломает совпадение</small></label>
+      <input type="range" id="edgeblur" min="0" max="10" value="4"></div>
     <div class="bgcols" id="bgcols"></div>
+    <div class="ctl" style="border:none;padding-top:8px"><small style="color:var(--mut)">Цвет выше — оттенок тонировки. Всё считается мгновенно, без тяжёлых моделей.</small></div>
   </div>
 
   <div class="panel">
@@ -120,7 +121,7 @@
 
   <div class="list" id="list"></div>
 
-  <p class="note">Бейдж «фон вырезан» — модель отработала уверенно. «проверь край» — мог остаться артефакт, глянь превью; если криво — тап «без фона». «без фона» — обработано только уникализацией. Имена и качество JPEG рандомизируются. Скачивай по одному или всё архивом.</p>
+  <p class="note">Всё считается мгновенно, прямо в браузере. Каждое фото получает: сдвинутый фон (тон + размытые края), новую геометрию, цвет, шум, чистый EXIF и случайное имя. Скачивай по одному (тап «Скачать») или всё архивом.</p>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -134,17 +135,6 @@ let bgSel=0;
 const bgcols=$('bgcols');
 BGS.forEach((c,i)=>{const b=document.createElement('button');b.style.background=c;
   if(i===0)b.classList.add('sel');b.onclick=()=>{bgSel=i;[...bgcols.children].forEach(x=>x.classList.remove('sel'));b.classList.add('sel')};bgcols.appendChild(b)});
-
-let removeBg=null,bgLoading=false;
-async function ensureBg(){
-  if(removeBg)return removeBg;
-  if(bgLoading){while(bgLoading)await new Promise(r=>setTimeout(r,200));return removeBg;}
-  bgLoading=true;statusEl.textContent='Загружаю модель вырезания фона…';
-  try{const mod=await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm');
-    removeBg=mod.removeBackground||mod.default;}
-  catch(e){statusEl.textContent='Модель фона не загрузилась — фото обработаются без замены фона.';removeBg='fail';}
-  bgLoading=false;return removeBg;
-}
 
 drop.addEventListener('click',()=>file.click());
 $('pickFiles').addEventListener('click',e=>{e.stopPropagation();file.click();});
@@ -212,18 +202,13 @@ function render(){
     meta.appendChild(nm);
 
     if(it.outURL){
-      const b=document.createElement('span');b.className='badge';
-      if(it.mode==='raw'){b.classList.add('raw');b.textContent='без фона';}
-      else if(it.quality==='warn'){b.classList.add('warn');b.textContent='проверь край';}
-      else{b.classList.add('ok');b.textContent='фон вырезан';}
+      const b=document.createElement('span');b.className='badge ok';b.textContent='готово';
       meta.appendChild(b);
     }
 
     const btns=document.createElement('div');btns.className='cardbtns';
     if(it.outURL){
       const dl=document.createElement('button');dl.textContent='Скачать';dl.onclick=()=>download(it);btns.appendChild(dl);
-      const rb=document.createElement('button');rb.textContent=it.mode==='bg'?'Без фона':'С фоном';
-      rb.onclick=()=>reprocess(it,it.mode==='bg'?'raw':'bg');btns.appendChild(rb);
     }
     const del=document.createElement('button');del.className='del';del.textContent='Удалить';
     del.onclick=()=>{items.splice(i,1);render()};btns.appendChild(del);
@@ -240,77 +225,44 @@ const rnd=(a,b)=>Math.random()*(b-a)+a;
 function randName(){const s='abcdefghijklmnopqrstuvwxyz0123456789';let r='';for(let i=0;i<10;i++)r+=s[Math.floor(Math.random()*36)];return `IMG_${r}.jpg`;}
 function loadImg(src){return new Promise(r=>{const i=new Image();i.crossOrigin='anonymous';i.onload=()=>r(i);i.src=src;});}
 
-// растушёвка альфа-канала: лёгкое размытие краёв маски
-function featherCanvas(srcCanvas,radius){
-  if(radius<=0)return srcCanvas;
-  const w=srcCanvas.width,h=srcCanvas.height;
-  const tmp=document.createElement('canvas');tmp.width=w;tmp.height=h;
-  const tx=tmp.getContext('2d');
-  tx.filter=`blur(${radius}px)`;
-  tx.drawImage(srcCanvas,0,0);
-  // переносим размытую альфу обратно на резкий цвет
-  const sharp=srcCanvas.getContext('2d').getImageData(0,0,w,h);
-  const soft=tx.getImageData(0,0,w,h);
-  for(let i=3;i<sharp.data.length;i+=4){sharp.data[i]=soft.data[i];}
-  const out=document.createElement('canvas');out.width=w;out.height=h;
-  out.getContext('2d').putImageData(sharp,0,0);
-  return out;
-}
-
-// оценка чистоты выреза: доля полупрозрачных пикселей по краю
-function estimateQuality(cutImg){
-  const w=cutImg.width,h=cutImg.height;
-  const c=document.createElement('canvas');c.width=w;c.height=h;
-  const x=c.getContext('2d');x.drawImage(cutImg,0,0);
-  const d=x.getImageData(0,0,w,h).data;
-  let edge=0,solid=0;
-  for(let i=3;i<d.length;i+=4){const a=d[i];if(a>10&&a<245)edge++;if(a>=245)solid++;}
-  // если предмет почти не найден или слишком много рваных краёв — warn
-  if(solid< (w*h*0.03)) return 'warn';
-  return (edge/(solid+1) > 0.25) ? 'warn' : 'ok';
-}
-
-async function processOne(it,forceMode){
-  const wantBg = forceMode ? forceMode==='bg' : $('bg').checked;
-  let baseSrc=it.srcURL,bgApplied=false,quality=null;
-
-  if(wantBg){
-    const fn=await ensureBg();
-    if(fn&&fn!=='fail'){
-      try{
-        const inBlob=await (await fetch(it.srcURL)).blob();
-        const cut=await fn(inBlob);
-        let cutImg=await loadImg(URL.createObjectURL(cut));
-        quality=estimateQuality(cutImg);
-        // рисуем вырез на канвас, фезерим край, ставим фон
-        let cc=document.createElement('canvas');cc.width=cutImg.width;cc.height=cutImg.height;
-        cc.getContext('2d').drawImage(cutImg,0,0);
-        cc=featherCanvas(cc,+$('feather').value);
-        const fin=document.createElement('canvas');fin.width=cc.width;fin.height=cc.height;
-        const fx=fin.getContext('2d');
-        fx.fillStyle=BGS[bgSel];fx.fillRect(0,0,fin.width,fin.height);
-        fx.drawImage(cc,0,0);
-        baseSrc=fin.toDataURL('image/png');bgApplied=true;
-      }catch(e){quality='warn';}
-    }
-  }
-
-  const img=await loadImg(baseSrc);
+async function processOne(it){
+  const img=await loadImg(it.srcURL);
   const cropPct=+$('crop').value/100,colorAmt=+$('color').value/100,rotAmt=+$('rot').value,
-        noiseAmt=+$('noise').value,vigAmt=+$('vig').value/100,flip=$('flip').checked,resize=$('resize').checked;
+        noiseAmt=+$('noise').value,vigAmt=+$('vig').value/100,flip=$('flip').checked,resize=$('resize').checked,
+        tintAmt=+$('tint').value/100,edgeBlur=+$('edgeblur').value;
   const cl=rnd(0,cropPct),cr=rnd(0,cropPct),ct=rnd(0,cropPct),cb=rnd(0,cropPct);
   const sx=img.width*cl,sy=img.height*ct,sw=img.width*(1-cl-cr),sh=img.height*(1-ct-cb);
   let dw=Math.round(sw),dh=Math.round(sh);
   if(resize){dw+=Math.round(rnd(-20,20));dh+=Math.round(rnd(-20,20));}
+  // ускорение: ограничиваем длинную сторону (Vinted всё равно сжимает)
+  const MAX=1600,long=Math.max(dw,dh);
+  if(long>MAX){const k=MAX/long;dw=Math.round(dw*k);dh=Math.round(dh*k);}
 
   const cv=document.createElement('canvas');cv.width=dw;cv.height=dh;
   const ctx=cv.getContext('2d');
-  ctx.fillStyle=bgApplied?BGS[bgSel]:'#ffffff';ctx.fillRect(0,0,dw,dh);
+  ctx.fillStyle='#ffffff';ctx.fillRect(0,0,dw,dh);
   const ang=rnd(-rotAmt,rotAmt)/10*Math.PI/180;
   ctx.save();ctx.translate(dw/2,dh/2);ctx.rotate(ang);if(flip)ctx.scale(-1,1);ctx.translate(-dw/2,-dh/2);
   const br=1+rnd(-colorAmt,colorAmt),co=1+rnd(-colorAmt,colorAmt),sa=1+rnd(-colorAmt,colorAmt);
   ctx.filter=`brightness(${br}) contrast(${co}) saturate(${sa})`;
   ctx.drawImage(img,sx,sy,sw,sh,0,0,dw,dh);ctx.restore();
+
+  // размытие краёв кадра: размытая копия по периметру через радиальную маску
+  if(edgeBlur>0){
+    const blur=document.createElement('canvas');blur.width=dw;blur.height=dh;
+    const bx=blur.getContext('2d');
+    bx.filter=`blur(${edgeBlur}px)`;bx.drawImage(cv,0,0);
+    bx.filter='none';
+    const mask=bx.createRadialGradient(dw/2,dh/2,Math.min(dw,dh)*0.30,dw/2,dh/2,Math.max(dw,dh)*0.62);
+    mask.addColorStop(0,'rgba(0,0,0,0)');mask.addColorStop(1,'rgba(0,0,0,1)');
+    bx.globalCompositeOperation='destination-in';bx.fillStyle=mask;bx.fillRect(0,0,dw,dh);
+    ctx.drawImage(blur,0,0);
+  }
+  // тонировка: лёгкий цветной оттенок поверх кадра
+  if(tintAmt>0){
+    ctx.save();ctx.globalAlpha=tintAmt;ctx.fillStyle=BGS[bgSel];
+    ctx.globalCompositeOperation='overlay';ctx.fillRect(0,0,dw,dh);ctx.restore();
+  }
 
   if(vigAmt>0){
     const g=ctx.createRadialGradient(dw/2,dh/2,Math.min(dw,dh)*0.35,dw/2,dh/2,Math.max(dw,dh)*0.75);
@@ -325,14 +277,8 @@ async function processOne(it,forceMode){
 
   await new Promise(res=>cv.toBlob(b=>{
     if(it.outURL)URL.revokeObjectURL(it.outURL);
-    it.outBlob=b;it.outURL=URL.createObjectURL(b);it.name=randName();
-    it.mode=bgApplied?'bg':'raw';it.quality=bgApplied?quality:null;res();
+    it.outBlob=b;it.outURL=URL.createObjectURL(b);it.name=randName();res();
   },'image/jpeg',rnd(.82,.93)));
-}
-
-async function reprocess(it,mode){
-  statusEl.textContent='Переобработка…';
-  await processOne(it,mode);statusEl.textContent='Готово.';render();
 }
 
 $('run').onclick=async()=>{
@@ -342,7 +288,7 @@ $('run').onclick=async()=>{
     await processOne(items[i]);
     $('barfill').style.width=`${(i+1)/items.length*100}%`;render();
   }
-  statusEl.textContent='Готово. Проверь бейджи «проверь край» — если есть.';
+  statusEl.textContent='Готово. Можно скачивать.';
   setTimeout(()=>{$('bar').style.display='none';$('barfill').style.width='0'},600);render();
 };
 
