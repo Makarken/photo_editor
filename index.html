@@ -3,27 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#15130f">
+<meta name="theme-color" content="#0e1116">
 <title>Студия фото · Vinted</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root[data-theme="dark"]{
-  --bg:#15130f;--bg2:#1d1a14;--card:#201c16;--card2:#262019;
-  --line:#36302600;--line-s:#3a342a;--ink:#f3ecdd;--ink-d:#a89e8a;--mut:#7d7464;
-  --gold:#e3b34e;--gold-d:#c69a3a;--green:#7bbd6f;--red:#d8765f;
-  --shadow:0 16px 40px -20px rgba(0,0,0,.7);--chk:#2a251d;
+  --bg:#0e1116;--bg2:#141923;--card:#161c27;--card2:#1c2430;
+  --line:#26303d00;--line-s:#2a3441;--ink:#eef2f7;--ink-d:#9aa7b8;--mut:#647082;
+  --gold:#5b8cff;--gold-d:#4674e6;--green:#3dd1a4;--red:#ff6b7a;
+  --shadow:0 16px 40px -20px rgba(0,0,0,.75);--chk:#1d2530;
 }
 :root[data-theme="light"]{
-  --bg:#f3efe6;--bg2:#ebe5d8;--card:#fbf8f1;--card2:#f4efe4;
-  --line:#e0d8c700;--line-s:#ddd4c0;--ink:#211d16;--ink-d:#5f574733;--mut:#857c69;
-  --gold:#a8801f;--gold-d:#8c6a16;--green:#3f7a3a;--red:#a8472f;
-  --shadow:0 14px 36px -22px rgba(60,50,20,.4);--chk:#ece5d5;
+  --bg:#eef1f6;--bg2:#e3e8f0;--card:#ffffff;--card2:#f1f4f9;
+  --line:#d4dbe700;--line-s:#d6dde8;--ink:#131820;--ink-d:#4a5666;--mut:#7c8798;
+  --gold:#2d5fe0;--gold-d:#1e4cc4;--green:#11a87a;--red:#e23b4e;
+  --shadow:0 14px 36px -22px rgba(30,50,90,.28);--chk:#e6ebf2;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--ink);
-  font-family:"Space Grotesk",system-ui,sans-serif;font-size:15px;line-height:1.5;
+  font-family:"Inter",system-ui,sans-serif;font-size:15px;line-height:1.5;
   transition:background .35s ease,color .35s ease}
 body{background-image:radial-gradient(120% 80% at 50% -10%,var(--bg2),transparent 60%)}
 .wrap{max-width:720px;margin:0 auto;padding:20px 16px 80px}
@@ -33,21 +33,21 @@ body{background-image:radial-gradient(120% 80% at 50% -10%,var(--bg2),transparen
 .brand{display:flex;align-items:center;gap:9px}
 .dot{width:11px;height:11px;border-radius:50%;background:var(--gold);
   box-shadow:0 0 0 4px color-mix(in srgb,var(--gold) 22%,transparent)}
-.brand span{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.18em;
+.brand span{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.18em;
   text-transform:uppercase;color:var(--mut)}
 .theme{display:flex;border:1px solid var(--line-s);border-radius:30px;padding:3px;background:var(--card)}
-.theme button{font-family:"JetBrains Mono",monospace;font-size:11px;border:none;background:none;
+.theme button{font-family:"IBM Plex Mono",monospace;font-size:11px;border:none;background:none;
   color:var(--mut);padding:6px 11px;border-radius:24px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:.2s}
-.theme button.on{background:var(--gold);color:#1a1408;font-weight:500}
+.theme button.on{background:var(--gold);color:#fff;font-weight:500}
 .theme svg{width:13px;height:13px}
 
 /* hero */
-h1{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:clamp(34px,9vw,52px);
+h1{font-family:"Archivo",sans-serif;font-weight:600;font-size:clamp(34px,9vw,52px);
   line-height:.98;letter-spacing:-.01em;margin:22px 0 10px}
 h1 em{font-style:italic;color:var(--gold)}
 .lede{color:var(--ink-d);font-size:15px;max-width:46ch;margin:0 0 6px}
 .meta-line{display:flex;gap:18px;margin:18px 0 24px;flex-wrap:wrap}
-.meta-line div{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--mut);letter-spacing:.03em}
+.meta-line div{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--mut);letter-spacing:.03em}
 .meta-line b{color:var(--gold);font-weight:500}
 
 /* instruction accordion */
@@ -57,7 +57,7 @@ h1 em{font-style:italic;color:var(--gold)}
   display:grid;place-items:center}
 .guide-head .ic svg{width:18px;height:18px;color:var(--gold)}
 .guide-head .t{flex:1}
-.guide-head .t b{font-family:"Fraunces",serif;font-weight:600;font-size:17px;display:block}
+.guide-head .t b{font-family:"Archivo",sans-serif;font-weight:600;font-size:17px;display:block}
 .guide-head .t small{color:var(--mut);font-size:12px}
 .guide-head .chev{transition:transform .3s;color:var(--mut)}
 .guide.open .chev{transform:rotate(180deg)}
@@ -66,12 +66,12 @@ h1 em{font-style:italic;color:var(--gold)}
 .guide-inner{padding:4px 18px 20px;border-top:1px solid var(--line-s)}
 .step{display:flex;gap:13px;padding:14px 0;border-bottom:1px dashed var(--line-s)}
 .step:last-child{border:none;padding-bottom:0}
-.step .n{flex:none;width:26px;height:26px;border-radius:50%;background:var(--gold);color:#1a1408;
-  font-family:"JetBrains Mono",monospace;font-weight:500;font-size:12px;display:grid;place-items:center;margin-top:1px}
-.step .x b{font-family:"Space Grotesk";font-weight:600;font-size:14px;display:block;margin-bottom:2px}
+.step .n{flex:none;width:26px;height:26px;border-radius:50%;background:var(--gold);color:#fff;
+  font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:12px;display:grid;place-items:center;margin-top:1px}
+.step .x b{font-family:"Inter";font-weight:600;font-size:14px;display:block;margin-bottom:2px}
 .step .x p{margin:0;color:var(--ink-d);font-size:13px;line-height:1.5}
 .gloss{margin-top:16px;padding-top:14px;border-top:1px solid var(--line-s)}
-.gloss h4{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin:0 0 10px}
+.gloss h4{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin:0 0 10px}
 .gloss dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:7px 14px}
 .gloss dt{font-weight:600;font-size:13px;color:var(--gold)}
 .gloss dd{margin:0;font-size:12.5px;color:var(--ink-d)}
@@ -84,16 +84,16 @@ h1 em{font-style:italic;color:var(--gold)}
 .drop .ring{width:54px;height:54px;margin:0 auto 12px;border-radius:50%;
   background:color-mix(in srgb,var(--gold) 14%,transparent);display:grid;place-items:center}
 .drop .ring svg{width:24px;height:24px;color:var(--gold)}
-.drop b{font-family:"Fraunces",serif;font-size:21px;display:block;margin-bottom:3px}
-.drop span{color:var(--mut);font-size:12.5px;font-family:"JetBrains Mono",monospace}
-.altpick{width:100%;margin-top:10px;font-family:"JetBrains Mono",monospace;font-size:12px;
+.drop b{font-family:"Archivo",sans-serif;font-size:21px;display:block;margin-bottom:3px}
+.drop span{color:var(--mut);font-size:12.5px;font-family:"IBM Plex Mono",monospace}
+.altpick{width:100%;margin-top:10px;font-family:"IBM Plex Mono",monospace;font-size:12px;
   border:1px solid var(--line-s);background:var(--card);color:var(--ink-d);padding:11px;border-radius:11px;cursor:pointer;transition:.2s}
 .altpick:hover{color:var(--ink);border-color:var(--gold-d)}
 
 /* panels */
 .panel{margin-top:16px;border:1px solid var(--line-s);border-radius:16px;background:var(--card);box-shadow:var(--shadow)}
-.panel h3{font-family:"Fraunces",serif;font-size:17px;font-weight:600;margin:0;padding:15px 18px 4px;display:flex;align-items:baseline;gap:8px}
-.panel h3 small{font-family:"JetBrains Mono",monospace;font-weight:400;font-size:10.5px;color:var(--mut);letter-spacing:.04em}
+.panel h3{font-family:"Archivo",sans-serif;font-size:17px;font-weight:600;margin:0;padding:15px 18px 4px;display:flex;align-items:baseline;gap:8px}
+.panel h3 small{font-family:"IBM Plex Mono",monospace;font-weight:400;font-size:10.5px;color:var(--mut);letter-spacing:.04em}
 .panel .pad{padding:6px 18px 16px}
 .ctl{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:11px 0;border-bottom:1px solid var(--line-s)}
 .ctl:last-child{border:none}
@@ -113,7 +113,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
 .sw input:checked+.tr{background:var(--green)}
 .sw input:checked+.tr:before{transform:translateX(20px)}
 .bgrow{display:flex;align-items:center;gap:9px;padding:13px 0 2px;flex-wrap:wrap}
-.bgrow .cap{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--mut);width:100%;margin-bottom:2px}
+.bgrow .cap{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--mut);width:100%;margin-bottom:2px}
 .bgcols{display:flex;gap:9px;flex-wrap:wrap}
 .bgcols button{width:32px;height:32px;border-radius:9px;border:2px solid var(--line-s);cursor:pointer;padding:0;transition:.15s;position:relative}
 .bgcols button.sel{border-color:var(--gold);transform:scale(1.08)}
@@ -121,15 +121,15 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
 
 /* status / actions */
 .status-wrap{margin:20px 0 4px;min-height:20px}
-.count{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--gold);letter-spacing:.04em}
-.status{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--mut);margin-top:3px;min-height:15px}
+.count{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--gold);letter-spacing:.04em}
+.status{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--mut);margin-top:3px;min-height:15px}
 .bar{height:6px;background:var(--line-s);border-radius:6px;overflow:hidden;margin-top:12px;display:none}
 .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold-d),var(--gold));transition:.25s;border-radius:6px}
 .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-.btn{font-family:"Space Grotesk";font-weight:600;font-size:14px;border:1px solid var(--line-s);
+.btn{font-family:"Inter";font-weight:600;font-size:14px;border:1px solid var(--line-s);
   background:var(--card);color:var(--ink);padding:13px 18px;border-radius:12px;cursor:pointer;flex:1;min-width:130px;transition:.18s}
 .btn:hover{border-color:var(--gold-d)}
-.btn.primary{background:var(--gold);border-color:var(--gold);color:#1a1408;flex:1.4}
+.btn.primary{background:var(--gold);border-color:var(--gold);color:#fff;flex:1.4}
 .btn.primary:hover{background:var(--gold-d)}
 .btn:disabled{opacity:.4;cursor:default;pointer-events:none}
 
@@ -142,16 +142,16 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
   background-size:14px 14px;background-position:0 0,7px 7px}
 .thumb img{width:100%;height:100%;object-fit:contain;display:block}
 .cmeta{flex:1;min-width:0}
-.cmeta .nm{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--mut);word-break:break-all}
-.badge{display:inline-flex;align-items:center;gap:5px;font-family:"JetBrains Mono",monospace;font-size:10px;
+.cmeta .nm{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--mut);word-break:break-all}
+.badge{display:inline-flex;align-items:center;gap:5px;font-family:"IBM Plex Mono",monospace;font-size:10px;
   padding:3px 9px;border-radius:20px;margin-top:6px;background:color-mix(in srgb,var(--green) 18%,transparent);color:var(--green)}
 .badge:before{content:"";width:5px;height:5px;border-radius:50%;background:var(--green)}
 .cbtns{display:flex;gap:7px;margin-top:9px}
-.cbtns button{font-family:"JetBrains Mono",monospace;font-size:11px;border:1px solid var(--line-s);
+.cbtns button{font-family:"IBM Plex Mono",monospace;font-size:11px;border:1px solid var(--line-s);
   background:var(--card2);color:var(--ink);padding:7px 11px;border-radius:8px;cursor:pointer;transition:.15s}
 .cbtns button:hover{border-color:var(--gold-d)}
 .cbtns button.del{color:var(--red)}
-.foot{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--mut);margin-top:24px;line-height:1.6;text-align:center}
+.foot{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--mut);margin-top:24px;line-height:1.6;text-align:center}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media(max-width:480px){.actions{flex-direction:column}.btn{flex:none}.thumb{width:72px;height:72px}}
 </style>
@@ -272,7 +272,7 @@ themeBox.querySelectorAll('button').forEach(b=>b.onclick=()=>{
   const t=b.dataset.t;
   document.documentElement.dataset.theme=t;
   themeBox.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
-  document.querySelector('meta[name=theme-color]').setAttribute('content', t==='dark'?'#15130f':'#f3efe6');
+  document.querySelector('meta[name=theme-color]').setAttribute('content', t==='dark'?'#0e1116':'#eef1f6');
 });
 
 /* ---------- ИНСТРУКЦИЯ ---------- */
