@@ -1,141 +1,305 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Фото-процессор · Vinted PRO</title>
+<meta name="theme-color" content="#15130f">
+<title>Студия фото · Vinted</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root{--ink:#16140f;--paper:#f6f2e9;--paper-2:#efe9dc;--line:#d8cfba;
-    --gold:#a8852e;--green:#3f6b3f;--red:#9a3b2e;--mut:#7a7263}
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0;background:var(--paper);color:var(--ink);
-    font-family:"DM Mono",ui-monospace,"SF Mono",Menlo,monospace;font-size:15px;line-height:1.45}
-  .wrap{max-width:760px;margin:0 auto;padding:18px 16px 64px}
-  header{padding:8px 0 18px;border-bottom:1px solid var(--line);margin-bottom:18px}
-  .eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin:0}
-  h1{font-family:Cormorant Garamond,Georgia,serif;font-weight:600;font-size:30px;line-height:1.05;margin:6px 0 4px}
-  .sub{color:var(--mut);font-size:13px;margin:0}
-  .drop{border:1.5px dashed var(--line);border-radius:14px;background:var(--paper-2);
-    padding:26px 18px;text-align:center;transition:.15s;cursor:pointer}
-  .drop.hot{border-color:var(--gold);background:#f1ead8}
-  .drop b{font-family:Cormorant Garamond,serif;font-size:20px;display:block;margin-bottom:4px}
-  .drop span{color:var(--mut);font-size:12px}
-  input[type=file]{display:none}
-  .panel{margin-top:18px;border:1px solid var(--line);border-radius:12px;background:var(--paper-2);padding:14px 16px}
-  .panel h3{font-family:Cormorant Garamond,serif;font-size:18px;margin:0 0 10px;font-weight:600}
-  .panel h3 small{font-weight:400;font-size:11px;color:var(--mut)}
-  .ctl{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--line)}
-  .ctl:last-child{border:none}
-  .ctl label{font-size:12.5px;flex:1}
-  .ctl small{display:block;color:var(--mut);font-size:11px;margin-top:1px}
-  input[type=range]{flex:0 0 110px;accent-color:var(--gold)}
-  .sw{position:relative;width:42px;height:24px;flex:0 0 42px}
-  .sw input{opacity:0;width:0;height:0}
-  .sw span{position:absolute;inset:0;background:var(--line);border-radius:24px;transition:.15s}
-  .sw span:before{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;background:var(--paper);border-radius:50%;transition:.15s}
-  .sw input:checked+span{background:var(--green)}
-  .sw input:checked+span:before{transform:translateX(18px)}
-  .bgcols{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-  .bgcols button{flex:none;width:30px;height:30px;border-radius:7px;border:2px solid var(--line);cursor:pointer;padding:0;min-width:0}
-  .bgcols button.sel{border-color:var(--gold)}
-  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
-  button.act{font-family:inherit;font-size:13px;border:1px solid var(--ink);background:var(--ink);color:var(--paper);
-    padding:11px 16px;border-radius:9px;cursor:pointer;flex:1;min-width:130px}
-  button.act.ghost{background:transparent;color:var(--ink)}
-  button.act.go{background:var(--gold);border-color:var(--gold);color:#1a1305;font-weight:600}
-  button.act:disabled{opacity:.4;cursor:default}
-  .count{font-size:12px;color:var(--gold);letter-spacing:.04em;margin-top:14px}
-  .status{font-size:11px;color:var(--mut);margin-top:4px;min-height:14px}
-  .bar{height:5px;background:var(--line);border-radius:3px;overflow:hidden;margin-top:12px;display:none}
-  .bar i{display:block;height:100%;width:0;background:var(--gold);transition:.2s}
-  /* список карточек */
-  .list{margin-top:18px;display:flex;flex-direction:column;gap:12px}
-  .card{border:1px solid var(--line);border-radius:12px;background:var(--paper-2);padding:12px;display:flex;gap:12px;align-items:flex-start}
-  .card .thumb{flex:0 0 110px;width:110px;height:110px;border-radius:9px;overflow:hidden;background:
-    conic-gradient(#0001 25%,#0000 0 50%,#0001 0 75%,#0000 0) 0/16px 16px,#fff;border:1px solid var(--line)}
-  .card .thumb img{width:100%;height:100%;object-fit:contain;display:block}
-  .card .meta{flex:1;min-width:0}
-  .card .name{font-size:12px;word-break:break-all;color:var(--mut)}
-  .badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:20px;margin-top:6px;letter-spacing:.03em}
-  .badge.ok{background:#e3ecdf;color:var(--green)}
-  .badge.warn{background:#f0e2d6;color:var(--red)}
-  .badge.raw{background:#ece7df;color:var(--mut)}
-  .cardbtns{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
-  .cardbtns button{font-family:inherit;font-size:11px;border:1px solid var(--line);background:var(--paper);
-    color:var(--ink);padding:6px 9px;border-radius:7px;cursor:pointer;min-width:0;flex:none}
-  .cardbtns button.del{color:var(--red)}
-  .note{font-size:11px;color:var(--mut);margin-top:18px;line-height:1.5}
-  @media(max-width:480px){h1{font-size:25px}.row{flex-direction:column}button.act{flex:none}
-    .card .thumb{flex-basis:84px;width:84px;height:84px}}
+:root[data-theme="dark"]{
+  --bg:#15130f;--bg2:#1d1a14;--card:#201c16;--card2:#262019;
+  --line:#36302600;--line-s:#3a342a;--ink:#f3ecdd;--ink-d:#a89e8a;--mut:#7d7464;
+  --gold:#e3b34e;--gold-d:#c69a3a;--green:#7bbd6f;--red:#d8765f;
+  --shadow:0 16px 40px -20px rgba(0,0,0,.7);--chk:#2a251d;
+}
+:root[data-theme="light"]{
+  --bg:#f3efe6;--bg2:#ebe5d8;--card:#fbf8f1;--card2:#f4efe4;
+  --line:#e0d8c700;--line-s:#ddd4c0;--ink:#211d16;--ink-d:#5f574733;--mut:#857c69;
+  --gold:#a8801f;--gold-d:#8c6a16;--green:#3f7a3a;--red:#a8472f;
+  --shadow:0 14px 36px -22px rgba(60,50,20,.4);--chk:#ece5d5;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Space Grotesk",system-ui,sans-serif;font-size:15px;line-height:1.5;
+  transition:background .35s ease,color .35s ease}
+body{background-image:radial-gradient(120% 80% at 50% -10%,var(--bg2),transparent 60%)}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 80px}
+
+/* top bar */
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.brand{display:flex;align-items:center;gap:9px}
+.dot{width:11px;height:11px;border-radius:50%;background:var(--gold);
+  box-shadow:0 0 0 4px color-mix(in srgb,var(--gold) 22%,transparent)}
+.brand span{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--mut)}
+.theme{display:flex;border:1px solid var(--line-s);border-radius:30px;padding:3px;background:var(--card)}
+.theme button{font-family:"JetBrains Mono",monospace;font-size:11px;border:none;background:none;
+  color:var(--mut);padding:6px 11px;border-radius:24px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:.2s}
+.theme button.on{background:var(--gold);color:#1a1408;font-weight:500}
+.theme svg{width:13px;height:13px}
+
+/* hero */
+h1{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:clamp(34px,9vw,52px);
+  line-height:.98;letter-spacing:-.01em;margin:22px 0 10px}
+h1 em{font-style:italic;color:var(--gold)}
+.lede{color:var(--ink-d);font-size:15px;max-width:46ch;margin:0 0 6px}
+.meta-line{display:flex;gap:18px;margin:18px 0 24px;flex-wrap:wrap}
+.meta-line div{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--mut);letter-spacing:.03em}
+.meta-line b{color:var(--gold);font-weight:500}
+
+/* instruction accordion */
+.guide{border:1px solid var(--line-s);border-radius:16px;background:var(--card);overflow:hidden;margin-bottom:22px;box-shadow:var(--shadow)}
+.guide-head{display:flex;align-items:center;gap:12px;padding:16px 18px;cursor:pointer;user-select:none}
+.guide-head .ic{flex:none;width:34px;height:34px;border-radius:10px;background:color-mix(in srgb,var(--gold) 16%,transparent);
+  display:grid;place-items:center}
+.guide-head .ic svg{width:18px;height:18px;color:var(--gold)}
+.guide-head .t{flex:1}
+.guide-head .t b{font-family:"Fraunces",serif;font-weight:600;font-size:17px;display:block}
+.guide-head .t small{color:var(--mut);font-size:12px}
+.guide-head .chev{transition:transform .3s;color:var(--mut)}
+.guide.open .chev{transform:rotate(180deg)}
+.guide-body{max-height:0;overflow:hidden;transition:max-height .4s ease}
+.guide.open .guide-body{max-height:1400px}
+.guide-inner{padding:4px 18px 20px;border-top:1px solid var(--line-s)}
+.step{display:flex;gap:13px;padding:14px 0;border-bottom:1px dashed var(--line-s)}
+.step:last-child{border:none;padding-bottom:0}
+.step .n{flex:none;width:26px;height:26px;border-radius:50%;background:var(--gold);color:#1a1408;
+  font-family:"JetBrains Mono",monospace;font-weight:500;font-size:12px;display:grid;place-items:center;margin-top:1px}
+.step .x b{font-family:"Space Grotesk";font-weight:600;font-size:14px;display:block;margin-bottom:2px}
+.step .x p{margin:0;color:var(--ink-d);font-size:13px;line-height:1.5}
+.gloss{margin-top:16px;padding-top:14px;border-top:1px solid var(--line-s)}
+.gloss h4{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin:0 0 10px}
+.gloss dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:7px 14px}
+.gloss dt{font-weight:600;font-size:13px;color:var(--gold)}
+.gloss dd{margin:0;font-size:12.5px;color:var(--ink-d)}
+
+/* dropzone */
+.drop{position:relative;border:1.5px dashed var(--line-s);border-radius:18px;background:var(--card);
+  padding:34px 20px;text-align:center;cursor:pointer;transition:.2s;overflow:hidden}
+.drop:hover{border-color:var(--gold-d)}
+.drop.hot{border-color:var(--gold);background:var(--card2);transform:scale(.995)}
+.drop .ring{width:54px;height:54px;margin:0 auto 12px;border-radius:50%;
+  background:color-mix(in srgb,var(--gold) 14%,transparent);display:grid;place-items:center}
+.drop .ring svg{width:24px;height:24px;color:var(--gold)}
+.drop b{font-family:"Fraunces",serif;font-size:21px;display:block;margin-bottom:3px}
+.drop span{color:var(--mut);font-size:12.5px;font-family:"JetBrains Mono",monospace}
+.altpick{width:100%;margin-top:10px;font-family:"JetBrains Mono",monospace;font-size:12px;
+  border:1px solid var(--line-s);background:var(--card);color:var(--ink-d);padding:11px;border-radius:11px;cursor:pointer;transition:.2s}
+.altpick:hover{color:var(--ink);border-color:var(--gold-d)}
+
+/* panels */
+.panel{margin-top:16px;border:1px solid var(--line-s);border-radius:16px;background:var(--card);box-shadow:var(--shadow)}
+.panel h3{font-family:"Fraunces",serif;font-size:17px;font-weight:600;margin:0;padding:15px 18px 4px;display:flex;align-items:baseline;gap:8px}
+.panel h3 small{font-family:"JetBrains Mono",monospace;font-weight:400;font-size:10.5px;color:var(--mut);letter-spacing:.04em}
+.panel .pad{padding:6px 18px 16px}
+.ctl{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:11px 0;border-bottom:1px solid var(--line-s)}
+.ctl:last-child{border:none}
+.ctl .lab{flex:1;min-width:0}
+.ctl .lab label{font-size:13.5px;font-weight:500}
+.ctl .lab small{display:block;color:var(--mut);font-size:11.5px;margin-top:1px;line-height:1.4}
+input[type=range]{flex:0 0 116px;height:4px;-webkit-appearance:none;appearance:none;
+  background:var(--line-s);border-radius:4px;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+  background:var(--gold);cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.3);transition:.15s}
+input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-radius:50%;background:var(--gold);cursor:pointer}
+.sw{position:relative;width:46px;height:26px;flex:0 0 46px}
+.sw input{opacity:0;width:0;height:0}
+.sw .tr{position:absolute;inset:0;background:var(--line-s);border-radius:26px;transition:.2s}
+.sw .tr:before{content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.sw input:checked+.tr{background:var(--green)}
+.sw input:checked+.tr:before{transform:translateX(20px)}
+.bgrow{display:flex;align-items:center;gap:9px;padding:13px 0 2px;flex-wrap:wrap}
+.bgrow .cap{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--mut);width:100%;margin-bottom:2px}
+.bgcols{display:flex;gap:9px;flex-wrap:wrap}
+.bgcols button{width:32px;height:32px;border-radius:9px;border:2px solid var(--line-s);cursor:pointer;padding:0;transition:.15s;position:relative}
+.bgcols button.sel{border-color:var(--gold);transform:scale(1.08)}
+.bgcols button.sel:after{content:"";position:absolute;inset:0;border-radius:7px;box-shadow:inset 0 0 0 2px var(--bg)}
+
+/* status / actions */
+.status-wrap{margin:20px 0 4px;min-height:20px}
+.count{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--gold);letter-spacing:.04em}
+.status{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--mut);margin-top:3px;min-height:15px}
+.bar{height:6px;background:var(--line-s);border-radius:6px;overflow:hidden;margin-top:12px;display:none}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold-d),var(--gold));transition:.25s;border-radius:6px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.btn{font-family:"Space Grotesk";font-weight:600;font-size:14px;border:1px solid var(--line-s);
+  background:var(--card);color:var(--ink);padding:13px 18px;border-radius:12px;cursor:pointer;flex:1;min-width:130px;transition:.18s}
+.btn:hover{border-color:var(--gold-d)}
+.btn.primary{background:var(--gold);border-color:var(--gold);color:#1a1408;flex:1.4}
+.btn.primary:hover{background:var(--gold-d)}
+.btn:disabled{opacity:.4;cursor:default;pointer-events:none}
+
+/* result list */
+.list{margin-top:20px;display:flex;flex-direction:column;gap:11px}
+.card{border:1px solid var(--line-s);border-radius:14px;background:var(--card);padding:11px;display:flex;gap:12px;align-items:center;animation:pop .3s ease both}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.thumb{flex:none;width:88px;height:88px;border-radius:10px;overflow:hidden;border:1px solid var(--line-s);
+  background-image:linear-gradient(45deg,var(--chk) 25%,transparent 0,transparent 75%,var(--chk) 0),linear-gradient(45deg,var(--chk) 25%,transparent 0,transparent 75%,var(--chk) 0);
+  background-size:14px 14px;background-position:0 0,7px 7px}
+.thumb img{width:100%;height:100%;object-fit:contain;display:block}
+.cmeta{flex:1;min-width:0}
+.cmeta .nm{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--mut);word-break:break-all}
+.badge{display:inline-flex;align-items:center;gap:5px;font-family:"JetBrains Mono",monospace;font-size:10px;
+  padding:3px 9px;border-radius:20px;margin-top:6px;background:color-mix(in srgb,var(--green) 18%,transparent);color:var(--green)}
+.badge:before{content:"";width:5px;height:5px;border-radius:50%;background:var(--green)}
+.cbtns{display:flex;gap:7px;margin-top:9px}
+.cbtns button{font-family:"JetBrains Mono",monospace;font-size:11px;border:1px solid var(--line-s);
+  background:var(--card2);color:var(--ink);padding:7px 11px;border-radius:8px;cursor:pointer;transition:.15s}
+.cbtns button:hover{border-color:var(--gold-d)}
+.cbtns button.del{color:var(--red)}
+.foot{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--mut);margin-top:24px;line-height:1.6;text-align:center}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media(max-width:480px){.actions{flex-direction:column}.btn{flex:none}.thumb{width:72px;height:72px}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <p class="eyebrow">Resale · batch tool PRO</p>
-    <h1>Фото-процессор</h1>
-    <p class="sub">Закинь до 30 фото. Каждую видно крупно после обработки — кривые отправляешь в режим «без фона» одним тапом, на Vinted уходит только чистое.</p>
-  </header>
 
+  <div class="top">
+    <div class="brand"><div class="dot"></div><span>resale studio</span></div>
+    <div class="theme" id="theme">
+      <button data-t="dark" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1111.2 3 7 7 0 0021 12.8z"/></svg>Тёмная</button>
+      <button data-t="light"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg>Светлая</button>
+    </div>
+  </div>
+
+  <h1>Прогони фото —<br>и <em>Vinted не узнает</em></h1>
+  <p class="lede">Закинь снимки, нажми одну кнопку — каждый получит новый цифровой отпечаток, сдвинутый фон и метаданные. Всё считается прямо в телефоне, ничего не уходит в интернет.</p>
+  <div class="meta-line">
+    <div>до <b>30</b> фото за раз</div>
+    <div>обработка <b>~1 сек</b></div>
+    <div>фото <b>остаются у тебя</b></div>
+  </div>
+
+  <!-- ИНСТРУКЦИЯ -->
+  <div class="guide" id="guide">
+    <div class="guide-head" id="guideHead">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg></div>
+      <div class="t"><b>Как пользоваться — на пальцах</b><small>Нажми, чтобы открыть. Тут всё объяснено просто.</small></div>
+      <svg class="chev" viewBox="0 0 24 24" width="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="guide-body">
+      <div class="guide-inner">
+        <div class="step"><div class="n">1</div><div class="x"><b>Загрузи фото</b><p>Нажми на большое поле «Перетащи фото сюда» и выбери снимки из галереи (можно сразу 15–30). Если из галереи не грузится — жми серую кнопку «Выбрать из Файлов» под ним.</p></div></div>
+        <div class="step"><div class="n">2</div><div class="x"><b>Ничего не настраивай (по умолчанию уже хорошо)</b><p>Все ползунки заранее выставлены на рабочие значения. Можешь сразу переходить к кнопке. Настройки — только если захочешь усилить или ослабить эффект.</p></div></div>
+        <div class="step"><div class="n">3</div><div class="x"><b>Выбери цвет тонировки (по желанию)</b><p>В блоке «Сдвиг фона» есть цветные квадратики — это лёгкий оттенок, который ляжет на фото. Светлый квадрат для светлых вещей, тёмный — для тёмных. Можно не трогать.</p></div></div>
+        <div class="step"><div class="n">4</div><div class="x"><b>Жми «Обработать всё»</b><p>Полоска заполнится за пару секунд. Под каждым фото появится зелёная плашка «готово».</p></div></div>
+        <div class="step"><div class="n">5</div><div class="x"><b>Скачай результат</b><p>«Скачать архивом» — заберёт все фото одним zip. Или жми «Скачать» под отдельным фото. Эти готовые снимки и заливай на Vinted.</p></div></div>
+
+        <div class="gloss">
+          <h4>Что делает каждая настройка</h4>
+          <dl>
+            <dt>Тонировка</dt><dd>Кладёт лёгкий цветной оттенок на весь кадр — меняет общий вид.</dd>
+            <dt>Размытие краёв</dt><dd>Мягко размывает фон по углам, предмет в центре остаётся резким.</dd>
+            <dt>Обрезка / зум</dt><dd>Слегка подрезает края — кадр перестаёт совпадать с оригиналом.</dd>
+            <dt>Сдвиг цвета</dt><dd>Чуть меняет яркость и насыщенность, незаметно глазу.</dd>
+            <dt>Поворот</dt><dd>Микро-наклон на доли градуса.</dd>
+            <dt>Шум</dt><dd>Невидимое зерно — главное, что ломает «цифровой отпечаток» фото.</dd>
+            <dt>Виньетка</dt><dd>Лёгкое затемнение углов, как в студийной съёмке.</dd>
+            <dt>Зеркало</dt><dd>Переворот по горизонтали. Включай только для симметричных вещей.</dd>
+            <dt>Чистка EXIF</dt><dd>Стирает старые метаданные (где, когда снято) и сбивает размер.</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ЗАГРУЗКА -->
   <label class="drop" id="drop">
+    <div class="ring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M5 16v3a2 2 0 002 2h10a2 2 0 002-2v-3"/></svg></div>
     <b>Перетащи фото сюда</b>
-    <span>или нажми, чтобы выбрать · JPG / PNG / WEBP</span>
-    <input type="file" id="file" accept="image/*,.heic,.heif" multiple>
+    <span>или нажми, чтобы выбрать · до 30 шт</span>
+    <input type="file" id="file" accept="image/*,.heic,.heif" multiple hidden>
   </label>
-  <div class="row" style="margin-top:10px">
-    <button class="act ghost" id="pickFiles" style="flex:1">Не грузится из медиатеки? Выбрать из «Файлов»</button>
-  </div>
+  <button class="altpick" id="pickFiles">Не грузится из галереи? Выбрать из «Файлов»</button>
 
+  <!-- ФОН -->
   <div class="panel">
-    <h3>Сдвиг фона <small>— быстро, против «фото из интернета»</small></h3>
-    <div class="ctl"><label>Тонировка<small>лёгкий цветовой оттенок поверх всего кадра</small></label>
-      <input type="range" id="tint" min="0" max="14" value="6"></div>
-    <div class="ctl"><label>Размытие краёв кадра<small>смягчает фон по периметру, ломает совпадение</small></label>
-      <input type="range" id="edgeblur" min="0" max="10" value="4"></div>
-    <div class="bgcols" id="bgcols"></div>
-    <div class="ctl" style="border:none;padding-top:8px"><small style="color:var(--mut)">Цвет выше — оттенок тонировки. Всё считается мгновенно, без тяжёлых моделей.</small></div>
+    <h3>Сдвиг фона <small>быстро · против «фото из интернета»</small></h3>
+    <div class="pad">
+      <div class="ctl"><div class="lab"><label>Тонировка</label><small>лёгкий цветовой оттенок поверх кадра</small></div><input type="range" id="tint" min="0" max="14" value="6"></div>
+      <div class="ctl"><div class="lab"><label>Размытие краёв</label><small>смягчает фон по периметру, ломает совпадение</small></div><input type="range" id="edgeblur" min="0" max="10" value="4"></div>
+      <div class="bgrow"><div class="cap">Цвет тонировки</div><div class="bgcols" id="bgcols"></div></div>
+    </div>
   </div>
 
+  <!-- УНИКАЛИЗАЦИЯ -->
   <div class="panel">
-    <h3>Уникализация</h3>
-    <div class="ctl"><label>Обрезка / зум кадра<small>срезает 1–7% по случайным сторонам</small></label><input type="range" id="crop" min="0" max="7" value="4"></div>
-    <div class="ctl"><label>Сдвиг цвета<small>яркость / контраст / насыщенность ±</small></label><input type="range" id="color" min="0" max="12" value="6"></div>
-    <div class="ctl"><label>Поворот<small>микро-наклон до ±2°</small></label><input type="range" id="rot" min="0" max="20" value="8"></div>
-    <div class="ctl"><label>Шум<small>невидимое зерно ломает хеш</small></label><input type="range" id="noise" min="0" max="14" value="8"></div>
-    <div class="ctl"><label>Виньетка<small>лёгкое студийное затемнение углов</small></label><input type="range" id="vig" min="0" max="10" value="3"></div>
-    <div class="ctl"><label>Зеркало по горизонтали<small>для симметричных вещей</small></label>
-      <span class="sw"><input type="checkbox" id="flip"><span></span></span></div>
-    <div class="ctl"><label>Чистить EXIF + рандом размер<small>удаляет метаданные, сбивает размер ±20px</small></label>
-      <span class="sw"><input type="checkbox" id="resize" checked><span></span></span></div>
+    <h3>Уникализация <small>цифровой отпечаток + геометрия</small></h3>
+    <div class="pad">
+      <div class="ctl"><div class="lab"><label>Обрезка / зум кадра</label><small>срезает 1–7% по случайным сторонам</small></div><input type="range" id="crop" min="0" max="7" value="4"></div>
+      <div class="ctl"><div class="lab"><label>Сдвиг цвета</label><small>яркость / контраст / насыщенность ±</small></div><input type="range" id="color" min="0" max="12" value="6"></div>
+      <div class="ctl"><div class="lab"><label>Поворот</label><small>микро-наклон до ±2°</small></div><input type="range" id="rot" min="0" max="20" value="8"></div>
+      <div class="ctl"><div class="lab"><label>Шум</label><small>невидимое зерно ломает хеш</small></div><input type="range" id="noise" min="0" max="14" value="8"></div>
+      <div class="ctl"><div class="lab"><label>Виньетка</label><small>лёгкое студийное затемнение углов</small></div><input type="range" id="vig" min="0" max="10" value="3"></div>
+      <div class="ctl"><div class="lab"><label>Зеркало по горизонтали</label><small>для симметричных вещей</small></div>
+        <span class="sw"><input type="checkbox" id="flip"><span class="tr"></span></span></div>
+      <div class="ctl"><div class="lab"><label>Чистить EXIF + рандом размер</label><small>удаляет метаданные, сбивает размер ±20px</small></div>
+        <span class="sw"><input type="checkbox" id="resize" checked><span class="tr"></span></span></div>
+    </div>
   </div>
 
-  <div class="count" id="count">Фото не выбраны</div>
-  <div class="status" id="status"></div>
-  <div class="bar" id="bar"><i id="barfill"></i></div>
+  <div class="status-wrap">
+    <div class="count" id="count">Фото не выбраны</div>
+    <div class="status" id="status"></div>
+    <div class="bar" id="bar"><i id="barfill"></i></div>
+  </div>
 
-  <div class="row">
-    <button class="act go" id="run" disabled>Обработать всё</button>
-    <button class="act ghost" id="zip" disabled>Скачать архивом</button>
-    <button class="act ghost" id="clear" disabled>Очистить</button>
+  <div class="actions">
+    <button class="btn primary" id="run" disabled>Обработать всё</button>
+    <button class="btn" id="zip" disabled>Скачать архивом</button>
+    <button class="btn" id="clear" disabled>Очистить</button>
   </div>
 
   <div class="list" id="list"></div>
 
-  <p class="note">Всё считается мгновенно, прямо в браузере. Каждое фото получает: сдвинутый фон (тон + размытые края), новую геометрию, цвет, шум, чистый EXIF и случайное имя. Скачивай по одному (тап «Скачать») или всё архивом.</p>
+  <p class="foot">всё работает офлайн в браузере · фото не покидают устройство</p>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script type="module">
 const $=id=>document.getElementById(id);
 const drop=$('drop'),file=$('file'),listEl=$('list'),statusEl=$('status');
-let items=[]; // {srcURL,outBlob,outURL,name,mode:'bg'|'raw',quality:'ok'|'warn'|null}
+let items=[]; // {srcURL,outBlob,outURL,name}
 
-const BGS=['#f3f1ec','#ffffff','#ece7df','#e7ebee','#1c1c1e','#d9d2c5'];
+/* ---------- ТЕМА ---------- */
+const themeBox=$('theme');
+themeBox.querySelectorAll('button').forEach(b=>b.onclick=()=>{
+  const t=b.dataset.t;
+  document.documentElement.dataset.theme=t;
+  themeBox.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
+  document.querySelector('meta[name=theme-color]').setAttribute('content', t==='dark'?'#15130f':'#f3efe6');
+});
+
+/* ---------- ИНСТРУКЦИЯ ---------- */
+$('guideHead').onclick=()=>$('guide').classList.toggle('open');
+
+/* ---------- ЦВЕТА ФОНА ---------- */
+const BGS=['#f3f1ec','#ffffff','#ece7df','#e7ebee','#1c1c1e','#d9d2c5','#e8ddc8','#dfe6df'];
 let bgSel=0;
 const bgcols=$('bgcols');
-BGS.forEach((c,i)=>{const b=document.createElement('button');b.style.background=c;
-  if(i===0)b.classList.add('sel');b.onclick=()=>{bgSel=i;[...bgcols.children].forEach(x=>x.classList.remove('sel'));b.classList.add('sel')};bgcols.appendChild(b)});
+BGS.forEach((c,i)=>{const b=document.createElement('button');b.style.background=c;b.title=c;
+  if(i===0)b.classList.add('sel');
+  b.onclick=()=>{bgSel=i;[...bgcols.children].forEach(x=>x.classList.remove('sel'));b.classList.add('sel')};
+  bgcols.appendChild(b)});
 
+/* ---------- HEIC ---------- */
+let heicLib=null,heicLoading=false;
+async function ensureHeic(){
+  if(heicLib)return heicLib;
+  if(heicLoading){while(heicLoading)await new Promise(r=>setTimeout(r,150));return heicLib;}
+  heicLoading=true;
+  try{heicLib=await import('https://cdn.jsdelivr.net/npm/heic-to@1.1.14/+esm');}
+  catch(e){heicLib='fail';}
+  heicLoading=false;return heicLib;
+}
+const isHeic=f=>{const n=(f.name||'').toLowerCase();return f.type==='image/heic'||f.type==='image/heif'||n.endsWith('.heic')||n.endsWith('.heif');};
+
+/* ---------- ЗАГРУЗКА ---------- */
 drop.addEventListener('click',()=>file.click());
 $('pickFiles').addEventListener('click',e=>{e.stopPropagation();file.click();});
 ['dragover','dragenter'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.add('hot')}));
@@ -143,77 +307,49 @@ $('pickFiles').addEventListener('click',e=>{e.stopPropagation();file.click();});
 drop.addEventListener('drop',ev=>handleFiles(ev.dataTransfer.files));
 file.addEventListener('change',()=>handleFiles(file.files));
 
-let heicLib=null,heicLoading=false;
-async function ensureHeic(){
-  if(heicLib)return heicLib;
-  if(heicLoading){while(heicLoading)await new Promise(r=>setTimeout(r,150));return heicLib;}
-  heicLoading=true;
-  try{const m=await import('https://cdn.jsdelivr.net/npm/heic-to@1.1.14/+esm');heicLib=m;}
-  catch(e){heicLib='fail';}
-  heicLoading=false;return heicLib;
-}
-function isHeic(f){
-  const n=(f.name||'').toLowerCase();
-  return f.type==='image/heic'||f.type==='image/heif'||n.endsWith('.heic')||n.endsWith('.heif');
-}
-
 async function handleFiles(fl){
   const all=[...fl];
-  if(!all.length){statusEl.textContent='Файлы не пришли — попробуй «Выбрать из файлов» вместо медиатеки.';return;}
-  let added=0,failed=0,converting=0;
+  if(!all.length){statusEl.textContent='Файлы не пришли — попробуй «Выбрать из Файлов».';return;}
+  let added=0,failed=0,conv=0;
   for(const f of all){
     if(items.length>=30)break;
-    // картинка по type ИЛИ по расширению (iPhone часто отдаёт пустой type)
     const n=(f.name||'').toLowerCase();
     const looksImage=f.type.startsWith('image/')||/\.(jpe?g|png|webp|heic|heif|gif|bmp)$/.test(n)||f.type==='';
     if(!looksImage){failed++;continue;}
-
     let blob=f;
     if(isHeic(f)){
-      converting++;statusEl.textContent=`Конвертирую HEIC… (${converting})`;
+      conv++;statusEl.textContent=`Конвертирую HEIC… (${conv})`;
       const lib=await ensureHeic();
-      if(lib&&lib!=='fail'){
-        try{blob=await lib.heicTo({blob:f,type:'image/jpeg',quality:0.92});}
-        catch(e){failed++;continue;}
-      }else{failed++;continue;}
+      if(lib&&lib!=='fail'){try{blob=await lib.heicTo({blob:f,type:'image/jpeg',quality:0.92});}catch(e){failed++;continue;}}
+      else{failed++;continue;}
     }
-    try{
-      const url=URL.createObjectURL(blob);
-      items.push({srcURL:url,outBlob:null,outURL:null,name:f.name||'photo.jpg',mode:null,quality:null});
-      added++;
-    }catch(e){failed++;}
+    try{items.push({srcURL:URL.createObjectURL(blob),outBlob:null,outURL:null,name:f.name||'photo.jpg'});added++;}
+    catch(e){failed++;}
   }
   render();
   let msg=`Загружено: ${added}`;
   if(failed)msg+=` · не вышло: ${failed}`;
-  if(items.length>=30)msg+=' · достигнут лимит 30';
-  if(added===0&&failed)msg+=' — попробуй выбрать через «Файлы», а не «Медиатеку».';
+  if(items.length>=30)msg+=' · лимит 30';
+  if(added===0&&failed)msg+=' — попробуй через «Файлы».';
   statusEl.textContent=msg;
 }
 
+/* ---------- РЕНДЕР СПИСКА ---------- */
 function render(){
   listEl.innerHTML='';
   items.forEach((it,i)=>{
     const card=document.createElement('div');card.className='card';
     const th=document.createElement('div');th.className='thumb';
     const img=document.createElement('img');img.src=it.outURL||it.srcURL;th.appendChild(img);
-    const meta=document.createElement('div');meta.className='meta';
-    const nm=document.createElement('div');nm.className='name';nm.textContent=it.outURL?it.name:'оригинал';
+    const meta=document.createElement('div');meta.className='cmeta';
+    const nm=document.createElement('div');nm.className='nm';nm.textContent=it.outURL?it.name:'оригинал';
     meta.appendChild(nm);
-
-    if(it.outURL){
-      const b=document.createElement('span');b.className='badge ok';b.textContent='готово';
-      meta.appendChild(b);
-    }
-
-    const btns=document.createElement('div');btns.className='cardbtns';
-    if(it.outURL){
-      const dl=document.createElement('button');dl.textContent='Скачать';dl.onclick=()=>download(it);btns.appendChild(dl);
-    }
+    if(it.outURL){const b=document.createElement('span');b.className='badge';b.textContent='готово';meta.appendChild(b);}
+    const btns=document.createElement('div');btns.className='cbtns';
+    if(it.outURL){const dl=document.createElement('button');dl.textContent='Скачать';dl.onclick=()=>download(it);btns.appendChild(dl);}
     const del=document.createElement('button');del.className='del';del.textContent='Удалить';
     del.onclick=()=>{items.splice(i,1);render()};btns.appendChild(del);
     meta.appendChild(btns);
-
     card.appendChild(th);card.appendChild(meta);listEl.appendChild(card);
   });
   const n=items.length,done=items.filter(i=>i.outURL).length;
@@ -221,6 +357,7 @@ function render(){
   $('run').disabled=!n;$('clear').disabled=!n;$('zip').disabled=done<1;
 }
 
+/* ---------- ОБРАБОТКА ---------- */
 const rnd=(a,b)=>Math.random()*(b-a)+a;
 function randName(){const s='abcdefghijklmnopqrstuvwxyz0123456789';let r='';for(let i=0;i<10;i++)r+=s[Math.floor(Math.random()*36)];return `IMG_${r}.jpg`;}
 function loadImg(src){return new Promise(r=>{const i=new Image();i.crossOrigin='anonymous';i.onload=()=>r(i);i.src=src;});}
@@ -234,7 +371,6 @@ async function processOne(it){
   const sx=img.width*cl,sy=img.height*ct,sw=img.width*(1-cl-cr),sh=img.height*(1-ct-cb);
   let dw=Math.round(sw),dh=Math.round(sh);
   if(resize){dw+=Math.round(rnd(-20,20));dh+=Math.round(rnd(-20,20));}
-  // ускорение: ограничиваем длинную сторону (Vinted всё равно сжимает)
   const MAX=1600,long=Math.max(dw,dh);
   if(long>MAX){const k=MAX/long;dw=Math.round(dw*k);dh=Math.round(dh*k);}
 
@@ -247,23 +383,19 @@ async function processOne(it){
   ctx.filter=`brightness(${br}) contrast(${co}) saturate(${sa})`;
   ctx.drawImage(img,sx,sy,sw,sh,0,0,dw,dh);ctx.restore();
 
-  // размытие краёв кадра: размытая копия по периметру через радиальную маску
   if(edgeBlur>0){
     const blur=document.createElement('canvas');blur.width=dw;blur.height=dh;
     const bx=blur.getContext('2d');
-    bx.filter=`blur(${edgeBlur}px)`;bx.drawImage(cv,0,0);
-    bx.filter='none';
+    bx.filter=`blur(${edgeBlur}px)`;bx.drawImage(cv,0,0);bx.filter='none';
     const mask=bx.createRadialGradient(dw/2,dh/2,Math.min(dw,dh)*0.30,dw/2,dh/2,Math.max(dw,dh)*0.62);
     mask.addColorStop(0,'rgba(0,0,0,0)');mask.addColorStop(1,'rgba(0,0,0,1)');
     bx.globalCompositeOperation='destination-in';bx.fillStyle=mask;bx.fillRect(0,0,dw,dh);
     ctx.drawImage(blur,0,0);
   }
-  // тонировка: лёгкий цветной оттенок поверх кадра
   if(tintAmt>0){
     ctx.save();ctx.globalAlpha=tintAmt;ctx.fillStyle=BGS[bgSel];
     ctx.globalCompositeOperation='overlay';ctx.fillRect(0,0,dw,dh);ctx.restore();
   }
-
   if(vigAmt>0){
     const g=ctx.createRadialGradient(dw/2,dh/2,Math.min(dw,dh)*0.35,dw/2,dh/2,Math.max(dw,dh)*0.75);
     g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,`rgba(0,0,0,${vigAmt})`);
@@ -274,7 +406,6 @@ async function processOne(it){
     for(let i=0;i<p.length;i+=4){const nz=(Math.random()-.5)*k;p[i]+=nz;p[i+1]+=nz;p[i+2]+=nz;}
     ctx.putImageData(d,0,0);
   }
-
   await new Promise(res=>cv.toBlob(b=>{
     if(it.outURL)URL.revokeObjectURL(it.outURL);
     it.outBlob=b;it.outURL=URL.createObjectURL(b);it.name=randName();res();
@@ -289,14 +420,16 @@ $('run').onclick=async()=>{
     $('barfill').style.width=`${(i+1)/items.length*100}%`;render();
   }
   statusEl.textContent='Готово. Можно скачивать.';
-  setTimeout(()=>{$('bar').style.display='none';$('barfill').style.width='0'},600);render();
+  setTimeout(()=>{$('bar').style.display='none';$('barfill').style.width='0'},700);render();
 };
 
 function download(it){const a=document.createElement('a');a.href=it.outURL;a.download=it.name;a.click();}
 $('zip').onclick=async()=>{
+  statusEl.textContent='Собираю архив…';
   const zip=new JSZip();items.filter(i=>i.outBlob).forEach(i=>zip.file(i.name,i.outBlob));
   const blob=await zip.generateAsync({type:'blob'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='vinted_photos.zip';a.click();
+  statusEl.textContent='Архив скачан.';
 };
 $('clear').onclick=()=>{items.forEach(i=>{URL.revokeObjectURL(i.srcURL);i.outURL&&URL.revokeObjectURL(i.outURL)});items=[];render();statusEl.textContent='';};
 </script>
