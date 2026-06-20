@@ -80,8 +80,11 @@
   <label class="drop" id="drop">
     <b>Перетащи фото сюда</b>
     <span>или нажми, чтобы выбрать · JPG / PNG / WEBP</span>
-    <input type="file" id="file" accept="image/*" multiple>
+    <input type="file" id="file" accept="image/*,.heic,.heif" multiple>
   </label>
+  <div class="row" style="margin-top:10px">
+    <button class="act ghost" id="pickFiles" style="flex:1">Не грузится из медиатеки? Выбрать из «Файлов»</button>
+  </div>
 
   <div class="panel">
     <h3>Замена фона <small>— главное против «фото из интернета»</small></h3>
@@ -144,16 +147,58 @@ async function ensureBg(){
 }
 
 drop.addEventListener('click',()=>file.click());
+$('pickFiles').addEventListener('click',e=>{e.stopPropagation();file.click();});
 ['dragover','dragenter'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.add('hot')}));
 ['dragleave','drop'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.remove('hot')}));
 drop.addEventListener('drop',ev=>handleFiles(ev.dataTransfer.files));
 file.addEventListener('change',()=>handleFiles(file.files));
 
-function handleFiles(fl){
-  [...fl].filter(f=>f.type.startsWith('image/')).slice(0,30-items.length).forEach(f=>{
-    items.push({srcURL:URL.createObjectURL(f),outBlob:null,outURL:null,name:f.name,mode:null,quality:null});
-  });
+let heicLib=null,heicLoading=false;
+async function ensureHeic(){
+  if(heicLib)return heicLib;
+  if(heicLoading){while(heicLoading)await new Promise(r=>setTimeout(r,150));return heicLib;}
+  heicLoading=true;
+  try{const m=await import('https://cdn.jsdelivr.net/npm/heic-to@1.1.14/+esm');heicLib=m;}
+  catch(e){heicLib='fail';}
+  heicLoading=false;return heicLib;
+}
+function isHeic(f){
+  const n=(f.name||'').toLowerCase();
+  return f.type==='image/heic'||f.type==='image/heif'||n.endsWith('.heic')||n.endsWith('.heif');
+}
+
+async function handleFiles(fl){
+  const all=[...fl];
+  if(!all.length){statusEl.textContent='Файлы не пришли — попробуй «Выбрать из файлов» вместо медиатеки.';return;}
+  let added=0,failed=0,converting=0;
+  for(const f of all){
+    if(items.length>=30)break;
+    // картинка по type ИЛИ по расширению (iPhone часто отдаёт пустой type)
+    const n=(f.name||'').toLowerCase();
+    const looksImage=f.type.startsWith('image/')||/\.(jpe?g|png|webp|heic|heif|gif|bmp)$/.test(n)||f.type==='';
+    if(!looksImage){failed++;continue;}
+
+    let blob=f;
+    if(isHeic(f)){
+      converting++;statusEl.textContent=`Конвертирую HEIC… (${converting})`;
+      const lib=await ensureHeic();
+      if(lib&&lib!=='fail'){
+        try{blob=await lib.heicTo({blob:f,type:'image/jpeg',quality:0.92});}
+        catch(e){failed++;continue;}
+      }else{failed++;continue;}
+    }
+    try{
+      const url=URL.createObjectURL(blob);
+      items.push({srcURL:url,outBlob:null,outURL:null,name:f.name||'photo.jpg',mode:null,quality:null});
+      added++;
+    }catch(e){failed++;}
+  }
   render();
+  let msg=`Загружено: ${added}`;
+  if(failed)msg+=` · не вышло: ${failed}`;
+  if(items.length>=30)msg+=' · достигнут лимит 30';
+  if(added===0&&failed)msg+=' — попробуй выбрать через «Файлы», а не «Медиатеку».';
+  statusEl.textContent=msg;
 }
 
 function render(){
