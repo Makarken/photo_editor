@@ -3,23 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0e1116">
+<meta name="theme-color" content="#14161a">
 <title>Студия фото · Vinted</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root[data-theme="dark"]{
-  --bg:#0e1116;--bg2:#141923;--card:#161c27;--card2:#1c2430;
-  --line:#26303d00;--line-s:#2a3441;--ink:#eef2f7;--ink-d:#9aa7b8;--mut:#647082;
-  --gold:#5b8cff;--gold-d:#4674e6;--green:#3dd1a4;--red:#ff6b7a;
-  --shadow:0 16px 40px -20px rgba(0,0,0,.75);--chk:#1d2530;
+  --bg:#14161a;--bg2:#1a1e23;--card:#1d2127;--card2:#242931;
+  --line:#2e343d00;--line-s:#323841;--ink:#eef0ec;--ink-d:#a7ada5;--mut:#6f756e;
+  --gold:#9ec19a;--gold-d:#86ab83;--green:#9ec19a;--red:#e0938a;
+  --shadow:0 16px 40px -20px rgba(0,0,0,.7);--chk:#262b32;--on-gold:#1a1f1a;
 }
 :root[data-theme="light"]{
-  --bg:#eef1f6;--bg2:#e3e8f0;--card:#ffffff;--card2:#f1f4f9;
-  --line:#d4dbe700;--line-s:#d6dde8;--ink:#131820;--ink-d:#4a5666;--mut:#7c8798;
-  --gold:#2d5fe0;--gold-d:#1e4cc4;--green:#11a87a;--red:#e23b4e;
-  --shadow:0 14px 36px -22px rgba(30,50,90,.28);--chk:#e6ebf2;
+  --bg:#f1f0ea;--bg2:#e8e7df;--card:#fcfbf7;--card2:#f2f1ea;
+  --line:#dcdbd200;--line-s:#dad9cf;--ink:#1f211c;--ink-d:#535852;--mut:#838880;
+  --gold:#5c8159;--gold-d:#4a6c47;--green:#5c8159;--red:#bd5d4f;
+  --shadow:0 14px 36px -22px rgba(50,55,40,.22);--chk:#e7e6dd;--on-gold:#ffffff;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--ink);
@@ -38,7 +38,7 @@ body{background-image:radial-gradient(120% 80% at 50% -10%,var(--bg2),transparen
 .theme{display:flex;border:1px solid var(--line-s);border-radius:30px;padding:3px;background:var(--card)}
 .theme button{font-family:"IBM Plex Mono",monospace;font-size:11px;border:none;background:none;
   color:var(--mut);padding:6px 11px;border-radius:24px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:.2s}
-.theme button.on{background:var(--gold);color:#fff;font-weight:500}
+.theme button.on{background:var(--gold);color:var(--on-gold);font-weight:500}
 .theme svg{width:13px;height:13px}
 
 /* hero */
@@ -66,7 +66,7 @@ h1 em{font-style:italic;color:var(--gold)}
 .guide-inner{padding:4px 18px 20px;border-top:1px solid var(--line-s)}
 .step{display:flex;gap:13px;padding:14px 0;border-bottom:1px dashed var(--line-s)}
 .step:last-child{border:none;padding-bottom:0}
-.step .n{flex:none;width:26px;height:26px;border-radius:50%;background:var(--gold);color:#fff;
+.step .n{flex:none;width:26px;height:26px;border-radius:50%;background:var(--gold);color:var(--on-gold);
   font-family:"IBM Plex Mono",monospace;font-weight:500;font-size:12px;display:grid;place-items:center;margin-top:1px}
 .step .x b{font-family:"Inter";font-weight:600;font-size:14px;display:block;margin-bottom:2px}
 .step .x p{margin:0;color:var(--ink-d);font-size:13px;line-height:1.5}
@@ -129,7 +129,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
 .btn{font-family:"Inter";font-weight:600;font-size:14px;border:1px solid var(--line-s);
   background:var(--card);color:var(--ink);padding:13px 18px;border-radius:12px;cursor:pointer;flex:1;min-width:130px;transition:.18s}
 .btn:hover{border-color:var(--gold-d)}
-.btn.primary{background:var(--gold);border-color:var(--gold);color:#fff;flex:1.4}
+.btn.primary{background:var(--gold);border-color:var(--gold);color:var(--on-gold);flex:1.4}
 .btn.primary:hover{background:var(--gold-d)}
 .btn:disabled{opacity:.4;cursor:default;pointer-events:none}
 
@@ -146,6 +146,8 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
 .badge{display:inline-flex;align-items:center;gap:5px;font-family:"IBM Plex Mono",monospace;font-size:10px;
   padding:3px 9px;border-radius:20px;margin-top:6px;background:color-mix(in srgb,var(--green) 18%,transparent);color:var(--green)}
 .badge:before{content:"";width:5px;height:5px;border-radius:50%;background:var(--green)}
+.badge.warn{background:color-mix(in srgb,var(--red) 18%,transparent);color:var(--red);margin-left:6px}
+.badge.warn:before{background:var(--red)}
 .cbtns{display:flex;gap:7px;margin-top:9px}
 .cbtns button{font-family:"IBM Plex Mono",monospace;font-size:11px;border:1px solid var(--line-s);
   background:var(--card2);color:var(--ink);padding:7px 11px;border-radius:8px;cursor:pointer;transition:.15s}
@@ -154,6 +156,40 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
 .foot{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--mut);margin-top:24px;line-height:1.6;text-align:center}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media(max-width:480px){.actions{flex-direction:column}.btn{flex:none}.thumb{width:72px;height:72px}}
+/* модалка */
+.modal-back{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);
+  display:grid;place-items:center;z-index:50;padding:20px;animation:fade .2s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.modal{width:100%;max-width:360px;background:var(--card);border:1px solid var(--line-s);
+  border-radius:18px;padding:22px;box-shadow:var(--shadow);animation:rise .25s ease}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.modal h4{font-family:"Archivo",sans-serif;font-weight:700;font-size:19px;margin:0 0 6px}
+.modal p{color:var(--ink-d);font-size:13px;margin:0 0 14px;line-height:1.5}
+.modal p b{color:var(--gold)}
+.modal input{width:100%;font-family:"IBM Plex Mono",monospace;font-size:18px;text-align:center;
+  letter-spacing:.08em;text-transform:uppercase;padding:13px;border-radius:11px;
+  border:1.5px solid var(--line-s);background:var(--card2);color:var(--ink);outline:none;transition:.15s}
+.modal input:focus{border-color:var(--gold)}
+.modal-btns{display:flex;gap:10px;margin-top:16px}
+.modal-btns .btn{flex:1;min-width:0}
+/* пресеты */
+.presets{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:4px 0 14px;border-bottom:1px solid var(--line-s);margin-bottom:4px}
+.presets-cap{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--mut)}
+.preset-btns{display:flex;gap:6px;background:var(--card2);padding:3px;border-radius:11px;border:1px solid var(--line-s)}
+.preset-btns button{font-family:"IBM Plex Mono",monospace;font-size:12px;border:none;background:none;
+  color:var(--mut);padding:7px 13px;border-radius:8px;cursor:pointer;transition:.15s}
+.preset-btns button.on{background:var(--gold);color:var(--on-gold);font-weight:500}
+/* сравнение до/после */
+.cmp-back{position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(4px);
+  display:grid;place-items:center;z-index:60;padding:18px;animation:fade .2s ease}
+.cmp{width:100%;max-width:440px}
+.cmp-imgs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cmp figure{margin:0}
+.cmp figcaption{font-family:"IBM Plex Mono",monospace;font-size:11px;color:#cfd4ca;text-align:center;margin-bottom:6px;letter-spacing:.05em}
+.cmp img{width:100%;border-radius:12px;border:1px solid rgba(255,255,255,.12);display:block;background:#222}
+.cmp-close{display:block;width:100%;margin-top:14px;font-family:"Inter";font-weight:600;font-size:14px;
+  background:var(--gold);color:var(--on-gold);border:none;padding:13px;border-radius:12px;cursor:pointer}
+.thumb{cursor:pointer}
 </style>
 </head>
 <body>
@@ -231,6 +267,14 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
   <div class="panel">
     <h3>Уникализация <small>цифровой отпечаток + геометрия</small></h3>
     <div class="pad">
+      <div class="presets" id="presets">
+        <span class="presets-cap">Сила обработки</span>
+        <div class="preset-btns">
+          <button data-p="soft">Слабо</button>
+          <button data-p="mid" class="on">Средне</button>
+          <button data-p="hard">Сильно</button>
+        </div>
+      </div>
       <div class="ctl"><div class="lab"><label>Обрезка / зум кадра</label><small>срезает 1–7% по случайным сторонам</small></div><input type="range" id="crop" min="0" max="7" value="4"></div>
       <div class="ctl"><div class="lab"><label>Сдвиг цвета</label><small>яркость / контраст / насыщенность ±</small></div><input type="range" id="color" min="0" max="12" value="6"></div>
       <div class="ctl"><div class="lab"><label>Поворот</label><small>микро-наклон до ±2°</small></div><input type="range" id="rot" min="0" max="20" value="8"></div>
@@ -266,25 +310,67 @@ const $=id=>document.getElementById(id);
 const drop=$('drop'),file=$('file'),listEl=$('list'),statusEl=$('status');
 let items=[]; // {srcURL,outBlob,outURL,name}
 
+/* ---------- ПАМЯТЬ НАСТРОЕК ---------- */
+const store={
+  get(k){try{return JSON.parse(localStorage.getItem('rs_'+k));}catch(e){return null;}},
+  set(k,v){try{localStorage.setItem('rs_'+k,JSON.stringify(v));}catch(e){}}
+};
+const RANGE_IDS=['tint','edgeblur','crop','color','rot','noise','vig'];
+const TOGGLE_IDS=['flip','resize'];
+
 /* ---------- ТЕМА ---------- */
 const themeBox=$('theme');
-themeBox.querySelectorAll('button').forEach(b=>b.onclick=()=>{
-  const t=b.dataset.t;
+function applyTheme(t){
   document.documentElement.dataset.theme=t;
-  themeBox.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
-  document.querySelector('meta[name=theme-color]').setAttribute('content', t==='dark'?'#0e1116':'#eef1f6');
-});
+  themeBox.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.t===t));
+  document.querySelector('meta[name=theme-color]').setAttribute('content', t==='dark'?'#14161a':'#f1f0ea');
+  store.set('theme',t);
+}
+themeBox.querySelectorAll('button').forEach(b=>b.onclick=()=>applyTheme(b.dataset.t));
+applyTheme(store.get('theme')||'dark');
 
 /* ---------- ИНСТРУКЦИЯ ---------- */
 $('guideHead').onclick=()=>$('guide').classList.toggle('open');
 
+/* ---------- ПРЕСЕТЫ ---------- */
+const PRESETS={
+  soft:{tint:3,edgeblur:2,crop:2,color:3,rot:4,noise:4,vig:2,flip:false,resize:true},
+  mid: {tint:6,edgeblur:4,crop:4,color:6,rot:8,noise:8,vig:3,flip:false,resize:true},
+  hard:{tint:10,edgeblur:7,crop:6,color:9,rot:14,noise:12,vig:5,flip:false,resize:true}
+};
+const presetBox=$('presets');
+function applyPreset(name){
+  const p=PRESETS[name];if(!p)return;
+  RANGE_IDS.forEach(id=>{if(id in p)$(id).value=p[id];});
+  if('flip' in p)$('flip').checked=p.flip;
+  if('resize' in p)$('resize').checked=p.resize;
+  presetBox.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.p===name));
+  store.set('preset',name);saveSettings();
+}
+presetBox.querySelectorAll('button').forEach(b=>b.onclick=()=>applyPreset(b.dataset.p));
+
+function saveSettings(){
+  const s={};RANGE_IDS.forEach(id=>s[id]=$(id).value);
+  TOGGLE_IDS.forEach(id=>s[id]=$(id).checked);store.set('settings',s);
+}
+function loadSettings(){
+  const s=store.get('settings');if(!s)return;
+  RANGE_IDS.forEach(id=>{if(id in s)$(id).value=s[id];});
+  TOGGLE_IDS.forEach(id=>{if(id in s)$(id).checked=s[id];});
+  const pr=store.get('preset');
+  if(pr)presetBox.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.p===pr));
+}
+// сохранять при любом изменении ползунков/тумблеров
+[...RANGE_IDS,...TOGGLE_IDS].forEach(id=>$(id).addEventListener('change',saveSettings));
+loadSettings();
+
 /* ---------- ЦВЕТА ФОНА ---------- */
 const BGS=['#f3f1ec','#ffffff','#ece7df','#e7ebee','#1c1c1e','#d9d2c5','#e8ddc8','#dfe6df'];
-let bgSel=0;
+let bgSel=store.get('bgSel')||0;
 const bgcols=$('bgcols');
 BGS.forEach((c,i)=>{const b=document.createElement('button');b.style.background=c;b.title=c;
-  if(i===0)b.classList.add('sel');
-  b.onclick=()=>{bgSel=i;[...bgcols.children].forEach(x=>x.classList.remove('sel'));b.classList.add('sel')};
+  if(i===bgSel)b.classList.add('sel');
+  b.onclick=()=>{bgSel=i;[...bgcols.children].forEach(x=>x.classList.remove('sel'));b.classList.add('sel');store.set('bgSel',i);};
   bgcols.appendChild(b)});
 
 /* ---------- HEIC ---------- */
@@ -341,10 +427,12 @@ function render(){
     const card=document.createElement('div');card.className='card';
     const th=document.createElement('div');th.className='thumb';
     const img=document.createElement('img');img.src=it.outURL||it.srcURL;th.appendChild(img);
+    if(it.outURL){th.onclick=()=>openCompare(it);th.title='Нажми — сравнить до/после';}
     const meta=document.createElement('div');meta.className='cmeta';
     const nm=document.createElement('div');nm.className='nm';nm.textContent=it.outURL?it.name:'оригинал';
     meta.appendChild(nm);
-    if(it.outURL){const b=document.createElement('span');b.className='badge';b.textContent='готово';meta.appendChild(b);}
+    if(it.outURL){const b=document.createElement('span');b.className='badge';b.textContent='готово · тап для сравнения';meta.appendChild(b);
+      if(it.small){const w=document.createElement('span');w.className='badge warn';w.textContent='маленькое фото <800px';meta.appendChild(w);}}
     const btns=document.createElement('div');btns.className='cbtns';
     if(it.outURL){const dl=document.createElement('button');dl.textContent='Скачать';dl.onclick=()=>download(it);btns.appendChild(dl);}
     const del=document.createElement('button');del.className='del';del.textContent='Удалить';
@@ -364,6 +452,7 @@ function loadImg(src){return new Promise(r=>{const i=new Image();i.crossOrigin='
 
 async function processOne(it){
   const img=await loadImg(it.srcURL);
+  it.small = Math.min(img.width,img.height) < 800; // Vinted любит >=800px по короткой стороне
   const cropPct=+$('crop').value/100,colorAmt=+$('color').value/100,rotAmt=+$('rot').value,
         noiseAmt=+$('noise').value,vigAmt=+$('vig').value/100,flip=$('flip').checked,resize=$('resize').checked,
         tintAmt=+$('tint').value/100,edgeBlur=+$('edgeblur').value;
@@ -424,13 +513,63 @@ $('run').onclick=async()=>{
 };
 
 function download(it){const a=document.createElement('a');a.href=it.outURL;a.download=it.name;a.click();}
-$('zip').onclick=async()=>{
+
+function openCompare(it){
+  const back=document.createElement('div');back.className='cmp-back';
+  back.innerHTML=`
+    <div class="cmp">
+      <div class="cmp-imgs">
+        <figure><figcaption>ДО</figcaption><img src="${it.srcURL}"></figure>
+        <figure><figcaption>ПОСЛЕ</figcaption><img src="${it.outURL}"></figure>
+      </div>
+      <button class="cmp-close">Закрыть</button>
+    </div>`;
+  document.body.appendChild(back);
+  const close=()=>back.remove();
+  back.querySelector('.cmp-close').onclick=close;
+  back.onclick=e=>{if(e.target===back)close();};
+}
+$('zip').onclick=()=>openPosModal();
+
+function sanitizePos(v){
+  // оставляем буквы (рус/лат) и цифры, убираем пробелы и опасные для имени символы
+  return (v||'').trim().replace(/[\\\/:*?"<>|]+/g,'').replace(/\s+/g,'_').slice(0,40);
+}
+
+async function buildZip(posName){
   statusEl.textContent='Собираю архив…';
-  const zip=new JSZip();items.filter(i=>i.outBlob).forEach(i=>zip.file(i.name,i.outBlob));
+  const zip=new JSZip();
+  items.filter(i=>i.outBlob).forEach(i=>zip.file(i.name,i.outBlob));
   const blob=await zip.generateAsync({type:'blob'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='vinted_photos.zip';a.click();
-  statusEl.textContent='Архив скачан.';
-};
+  const clean=sanitizePos(posName);
+  const fname=clean?`${clean}.zip`:'vinted_photos.zip';
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fname;a.click();
+  statusEl.textContent=`Архив «${fname}» скачан.`;
+}
+
+/* модалка ввода номера позиции */
+function openPosModal(){
+  const back=document.createElement('div');back.className='modal-back';
+  back.innerHTML=`
+    <div class="modal">
+      <h4>Номер позиции</h4>
+      <p>Архив сохранится под этим именем — например <b>К11</b>, <b>Л22</b>, <b>С3</b>.</p>
+      <input type="text" id="posInput" placeholder="например К11" autocomplete="off" autocapitalize="characters">
+      <div class="modal-btns">
+        <button class="btn" id="posCancel">Отмена</button>
+        <button class="btn primary" id="posOk">Скачать</button>
+      </div>
+    </div>`;
+  document.body.appendChild(back);
+  const inp=back.querySelector('#posInput');
+  setTimeout(()=>inp.focus(),50);
+  const close=()=>back.remove();
+  back.querySelector('#posCancel').onclick=close;
+  back.onclick=e=>{if(e.target===back)close();};
+  const go=async()=>{const v=inp.value;close();await buildZip(v);};
+  back.querySelector('#posOk').onclick=go;
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')go();});
+}
 $('clear').onclick=()=>{items.forEach(i=>{URL.revokeObjectURL(i.srcURL);i.outURL&&URL.revokeObjectURL(i.outURL)});items=[];render();statusEl.textContent='';};
 </script>
 </body>
