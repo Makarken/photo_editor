@@ -124,6 +124,11 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
 .count{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--gold);letter-spacing:.04em}
 .status{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--mut);margin-top:3px;min-height:15px}
 .bar{height:6px;background:var(--line-s);border-radius:6px;overflow:hidden;margin-top:12px;display:none}
+.cloud-bar{margin-top:12px;animation:rise .2s ease}
+.cb-label{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--gold);margin-bottom:5px}
+.cb-track{height:8px;background:var(--line-s);border-radius:8px;overflow:hidden}
+.cb-track i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold-d),var(--gold));transition:width .25s;border-radius:8px}
+.cb-pct{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--mut);text-align:right;margin-top:4px}
 .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold-d),var(--gold));transition:.25s;border-radius:6px}
 .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
 .btn{font-family:"Inter";font-weight:600;font-size:14px;border:1px solid var(--line-s);
@@ -319,7 +324,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
 
   <div class="list" id="list"></div>
 
-  <p class="foot">всё работает офлайн в браузере · фото не покидают устройство<br>версия 8 · облако + оригинал/обработка</p>
+  <p class="foot">всё работает офлайн в браузере · фото не покидают устройство<br>версия 9 · прогресс облака + Попитал</p>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -583,8 +588,9 @@ async function uploadCloud(posName,desc,what){
   const clean=sanitizePos(posName);
   if(!clean){statusEl.textContent='Нужен номер позиции для загрузки в облако.';return;}
   if(!cloud.ready){statusEl.textContent='Облако не настроено — нажми «Настроить облако».';return;}
-  const base=clean.replace(/[^A-Za-zА-Яа-я]/,'')[0];
-  const send=async(kind,getBlob)=>{
+
+  // загрузка одной пачки через XHR с прогрессом
+  const send=(kind,getBlob)=>new Promise(async(resolve,reject)=>{
     const fd=new FormData();
     fd.append('position',clean);fd.append('description',desc||'');fd.append('kind',kind);
     let n=0;
@@ -594,19 +600,50 @@ async function uploadCloud(posName,desc,what){
       if(!b)continue;
       fd.append('photos',b,it.name||`${kind}_${n}.jpg`);n++;
     }
-    if(n===0)return {kind,saved:0};
-    const r=await fetch(`${cloud.api.replace(/\/$/,'')}/upload`,{method:'POST',headers:{'X-Token':cloud.token},body:fd});
-    if(r.status===401)throw new Error('Неверный пароль облака');
-    if(!r.ok){const t=await r.text();throw new Error('Ошибка облака: '+t.slice(0,80));}
-    const d=await r.json();return {kind,saved:d.saved};
-  };
+    if(n===0){resolve({kind,saved:0});return;}
+    const xhr=new XMLHttpRequest();
+    xhr.open('POST',`${cloud.api.replace(/\/$/,'')}/upload`);
+    xhr.setRequestHeader('X-Token',cloud.token);
+    xhr.upload.onprogress=e=>{
+      if(e.lengthComputable){
+        const pct=Math.round(e.loaded/e.total*100);
+        setCloudProgress(pct,kind==='processed'?'обработанные':'оригиналы');
+      }
+    };
+    xhr.onload=()=>{
+      if(xhr.status===401){reject(new Error('Неверный пароль облака'));return;}
+      if(xhr.status<200||xhr.status>=300){reject(new Error('Ошибка облака: '+xhr.responseText.slice(0,80)));return;}
+      try{const d=JSON.parse(xhr.responseText);resolve({kind,saved:d.saved});}
+      catch(e){reject(new Error('Плохой ответ облака'));}
+    };
+    xhr.onerror=()=>reject(new Error('Нет связи с облаком'));
+    xhr.send(fd);
+  });
+
   try{
-    statusEl.textContent='Загружаю в облако…';
+    showCloudBar(true);setCloudProgress(0,'подготовка');
     let total=0;
     if(what==='processed'||what==='both'){const x=await send('processed');total+=x.saved;}
     if(what==='original'||what==='both'){const x=await send('original',origBlob);total+=x.saved;}
+    setCloudProgress(100,'готово');
     statusEl.textContent=`В облако загружено: ${total} фото · позиция ${clean}.`;
-  }catch(e){statusEl.textContent=String(e.message||e);}
+    setTimeout(()=>showCloudBar(false),1200);
+  }catch(e){statusEl.textContent=String(e.message||e);showCloudBar(false);}
+}
+
+// визуальная шкала загрузки в облако
+function showCloudBar(on){
+  let bar=$('cloudBar');
+  if(on&&!bar){
+    bar=document.createElement('div');bar.id='cloudBar';bar.className='cloud-bar';
+    bar.innerHTML=`<div class="cb-label" id="cbLabel">Загрузка…</div><div class="cb-track"><i id="cbFill"></i></div><div class="cb-pct" id="cbPct">0%</div>`;
+    $('status').after(bar);
+  }else if(!on&&bar){bar.remove();}
+}
+function setCloudProgress(pct,label){
+  const f=$('cbFill'),p=$('cbPct'),l=$('cbLabel');
+  if(f)f.style.width=pct+'%';if(p)p.textContent=pct+'%';
+  if(l&&label)l.textContent='Загрузка в облако · '+label;
 }
 
 /* модалка сохранения: 3 шага — номер → описание → куда */
