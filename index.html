@@ -107,8 +107,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 input[type=range]::-webkit-slider-thumb:active{transform:scale(1.2)}
 input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-radius:50%;background:var(--gold);cursor:pointer}
 .sw{position:relative;width:46px;height:26px;flex:0 0 46px}
-.sw input{opacity:0;width:0;height:0}
-.sw .tr{position:absolute;inset:0;background:var(--line-s);border-radius:26px;transition:.2s}
+.sw input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer;z-index:2}
+.sw .tr{position:absolute;inset:0;background:var(--line-s);border-radius:26px;transition:.2s;pointer-events:none}
 .sw .tr:before{content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
 .sw input:checked+.tr{background:var(--green)}
 .sw input:checked+.tr:before{transform:translateX(20px)}
@@ -137,6 +137,8 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
 .btn.primary{background:var(--gold);border-color:var(--gold);color:var(--on-gold);flex:1.4}
 .btn.primary:hover{background:var(--gold-d)}
 .btn:disabled{opacity:.4;cursor:default;pointer-events:none}
+.cloud-orig-btn{border-color:var(--gold);color:var(--gold-d);flex:2}
+.cloud-orig-btn:hover{background:color-mix(in srgb,var(--gold) 10%,var(--card))}
 
 /* result list */
 .list{margin-top:20px;display:flex;flex-direction:column;gap:11px}
@@ -318,13 +320,16 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
 
   <div class="actions">
     <button class="btn primary" id="run" disabled>Обработать всё</button>
-    <button class="btn" id="zip" disabled>Скачать архивом</button>
+    <button class="btn" id="zip" disabled>Сохранить / в облако</button>
+  </div>
+  <div class="actions">
+    <button class="btn cloud-orig-btn" id="origCloud" disabled>☁ Загрузить оригиналы в облако</button>
     <button class="btn" id="clear" disabled>Очистить</button>
   </div>
 
   <div class="list" id="list"></div>
 
-  <p class="foot">всё работает офлайн в браузере · фото не покидают устройство<br>версия 9 · прогресс облака + Попитал</p>
+  <p class="foot">всё работает офлайн в браузере · фото не покидают устройство<br>версия 10 · быстрая загрузка + фикс переключателей</p>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -465,7 +470,7 @@ function render(){
   });
   const n=items.length,done=items.filter(i=>i.outURL).length;
   $('count').textContent=n?`${n} фото${done?` · обработано ${done}`:''}`:'Фото не выбраны';
-  $('run').disabled=!n;$('clear').disabled=!n;$('zip').disabled=done<1;
+  $('run').disabled=!n;$('clear').disabled=!n;$('zip').disabled=done<1;$('origCloud').disabled=!n;
 }
 
 /* ---------- ОБРАБОТКА ---------- */
@@ -553,6 +558,7 @@ function openCompare(it){
   back.onclick=e=>{if(e.target===back)close();};
 }
 $('zip').onclick=()=>openPosModal();
+$('origCloud').onclick=()=>openPosModal('original');
 
 function sanitizePos(v){
   // оставляем буквы (рус/лат) и цифры, убираем пробелы и опасные для имени символы
@@ -647,12 +653,16 @@ function setCloudProgress(pct,label){
 }
 
 /* модалка сохранения: 3 шага — номер → описание → куда */
-function openPosModal(){
+function openPosModal(forceMode){
+  // forceMode: undefined (полный мастер) | 'original' (сразу грузим оригиналы в облако)
   const back=document.createElement('div');back.className='modal-back';
+  const step2btn = forceMode==='original'
+    ? `<button class="btn primary" id="doOrig">☁ Загрузить оригиналы</button>`
+    : `<button class="btn primary" id="toStep3">Дальше →</button>`;
   back.innerHTML=`
     <div class="modal">
       <div class="steps">
-        <span class="dot on" data-s="1"></span><span class="dot" data-s="2"></span><span class="dot" data-s="3"></span>
+        <span class="dot on" data-s="1"></span><span class="dot" data-s="2"></span>${forceMode?'':'<span class="dot" data-s="3"></span>'}
       </div>
 
       <div class="step-pane" data-pane="1">
@@ -667,11 +677,11 @@ function openPosModal(){
 
       <div class="step-pane" data-pane="2" hidden>
         <h4>Шаг 2 — описание товара</h4>
-        <p>Сохранится в архиве файлом <b>описание.txt</b> и в облаке. Можно пропустить.</p>
+        <p>${forceMode==='original'?'Грузим <b>оригиналы</b> в облако. Описание можно добавить.':'Сохранится в архиве файлом <b>описание.txt</b> и в облаке. Можно пропустить.'}</p>
         <textarea id="descInput" rows="5" placeholder="Бренд, модель, состояние, размер, цена…"></textarea>
         <div class="modal-btns">
           <button class="btn" id="backStep1">← Назад</button>
-          <button class="btn primary" id="toStep3">Дальше →</button>
+          ${step2btn}
         </div>
       </div>
 
@@ -697,26 +707,30 @@ function openPosModal(){
   setTimeout(()=>inp.focus(),50);
   const close=()=>back.remove();
   function showStep(n){
-    panes.forEach((p,i)=>p.hidden=(i+1)!==n);
+    panes.forEach((p,i)=>{if(p)p.hidden=(i+1)!==n;});
     dots.forEach(d=>d.classList.toggle('on',+d.dataset.s<=n));
     if(n<3)setTimeout(()=>(n===1?inp:desc).focus(),50);
   }
   back.querySelector('#posCancel').onclick=close;
   back.querySelector('#toStep2').onclick=()=>{if(!sanitizePos(inp.value)){inp.style.borderColor='var(--red)';return;}showStep(2);};
   back.querySelector('#backStep1').onclick=()=>showStep(1);
-  back.querySelector('#toStep3').onclick=()=>showStep(3);
-  back.querySelector('#backStep2').onclick=()=>showStep(2);
   back.onclick=e=>{if(e.target===back)close();};
   inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();back.querySelector('#toStep2').click();}});
 
-  back.querySelectorAll('.dest-btn').forEach(b=>b.onclick=async()=>{
-    const v=inp.value,d=desc.value,act=b.dataset.act;close();
-    if(act==='phone')await buildZip(v,d);
-    else if(act==='cloud-proc')await uploadCloud(v,d,'processed');
-    else if(act==='cloud-orig')await uploadCloud(v,d,'original');
-    else if(act==='cloud-both')await uploadCloud(v,d,'both');
-  });
-  back.querySelector('#cloudCfg').onclick=()=>{close();openCloudConfig();};
+  if(forceMode==='original'){
+    back.querySelector('#doOrig').onclick=async()=>{const v=inp.value,d=desc.value;close();await uploadCloud(v,d,'original');};
+  }else{
+    back.querySelector('#toStep3').onclick=()=>showStep(3);
+    back.querySelector('#backStep2').onclick=()=>showStep(2);
+    back.querySelectorAll('.dest-btn').forEach(b=>b.onclick=async()=>{
+      const v=inp.value,d=desc.value,act=b.dataset.act;close();
+      if(act==='phone')await buildZip(v,d);
+      else if(act==='cloud-proc')await uploadCloud(v,d,'processed');
+      else if(act==='cloud-orig')await uploadCloud(v,d,'original');
+      else if(act==='cloud-both')await uploadCloud(v,d,'both');
+    });
+    back.querySelector('#cloudCfg').onclick=()=>{close();openCloudConfig();};
+  }
 }
 
 /* настройка облака */
