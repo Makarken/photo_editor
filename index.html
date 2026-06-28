@@ -184,6 +184,12 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
 .steps .dot.on{background:var(--gold)}
 .step-pane[hidden]{display:none}
 .step-pane{animation:rise .25s ease}
+.dest{display:flex;flex-direction:column;gap:9px;margin-top:4px}
+.dest-btn{text-align:left;border:1.5px solid var(--line-s);background:var(--card2);color:var(--ink);
+  padding:13px 14px;border-radius:12px;cursor:pointer;transition:.15s;font-family:"Inter"}
+.dest-btn:hover{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 8%,var(--card2))}
+.dest-btn b{display:block;font-size:14px;font-weight:600}
+.dest-btn small{display:block;color:var(--mut);font-size:12px;margin-top:2px}
 /* пресеты */
 .presets{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:4px 0 14px;border-bottom:1px solid var(--line-s);margin-bottom:4px}
 .presets-cap{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--mut)}
@@ -313,7 +319,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border:none;border-ra
 
   <div class="list" id="list"></div>
 
-  <p class="foot">всё работает офлайн в браузере · фото не покидают устройство<br>версия 7 · два шага: номер + описание</p>
+  <p class="foot">всё работает офлайн в браузере · фото не покидают устройство<br>версия 8 · облако + оригинал/обработка</p>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -548,36 +554,73 @@ function sanitizePos(v){
   return (v||'').trim().replace(/[\\\/:*?"<>|]+/g,'').replace(/\s+/g,'_').slice(0,40);
 }
 
+/* ---------- НАСТРОЙКИ ОБЛАКА ---------- */
+const cloud={
+  get api(){return store.get('cloud_api')||'';},
+  get token(){return store.get('cloud_token')||'';},
+  set(api,token){store.set('cloud_api',api);store.set('cloud_token',token);},
+  get ready(){return !!(this.api&&this.token);}
+};
+
 async function buildZip(posName,desc){
   statusEl.textContent='Собираю архив…';
   const zip=new JSZip();
   items.filter(i=>i.outBlob).forEach(i=>zip.file(i.name,i.outBlob));
   const clean=sanitizePos(posName);
-  // описание кладём текстовым файлом, если оно введено
   const text=(desc||'').trim();
-  if(text){
-    const header=clean?`Позиция: ${clean}\n\n`:'';
-    zip.file('описание.txt', header+text);
-  }
+  if(text){const header=clean?`Позиция: ${clean}\n\n`:'';zip.file('описание.txt', header+text);}
   const blob=await zip.generateAsync({type:'blob'});
   const fname=clean?`${clean}.zip`:'vinted_photos.zip';
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fname;a.click();
   statusEl.textContent=`Архив «${fname}» скачан${text?' (с описанием)':''}.`;
 }
 
-/* модалка: номер позиции + описание */
+// получить исходный blob фото (оригинал)
+async function origBlob(it){return await (await fetch(it.srcURL)).blob();}
+
+async function uploadCloud(posName,desc,what){
+  // what: 'processed' | 'original' | 'both'
+  const clean=sanitizePos(posName);
+  if(!clean){statusEl.textContent='Нужен номер позиции для загрузки в облако.';return;}
+  if(!cloud.ready){statusEl.textContent='Облако не настроено — нажми «Настроить облако».';return;}
+  const base=clean.replace(/[^A-Za-zА-Яа-я]/,'')[0];
+  const send=async(kind,getBlob)=>{
+    const fd=new FormData();
+    fd.append('position',clean);fd.append('description',desc||'');fd.append('kind',kind);
+    let n=0;
+    for(const it of items){
+      if(kind==='processed'&&!it.outBlob)continue;
+      const b=kind==='processed'?it.outBlob:await getBlob(it);
+      if(!b)continue;
+      fd.append('photos',b,it.name||`${kind}_${n}.jpg`);n++;
+    }
+    if(n===0)return {kind,saved:0};
+    const r=await fetch(`${cloud.api.replace(/\/$/,'')}/upload`,{method:'POST',headers:{'X-Token':cloud.token},body:fd});
+    if(r.status===401)throw new Error('Неверный пароль облака');
+    if(!r.ok){const t=await r.text();throw new Error('Ошибка облака: '+t.slice(0,80));}
+    const d=await r.json();return {kind,saved:d.saved};
+  };
+  try{
+    statusEl.textContent='Загружаю в облако…';
+    let total=0;
+    if(what==='processed'||what==='both'){const x=await send('processed');total+=x.saved;}
+    if(what==='original'||what==='both'){const x=await send('original',origBlob);total+=x.saved;}
+    statusEl.textContent=`В облако загружено: ${total} фото · позиция ${clean}.`;
+  }catch(e){statusEl.textContent=String(e.message||e);}
+}
+
+/* модалка сохранения: 3 шага — номер → описание → куда */
 function openPosModal(){
   const back=document.createElement('div');back.className='modal-back';
   back.innerHTML=`
     <div class="modal">
       <div class="steps">
-        <span class="dot on" data-s="1"></span>
-        <span class="dot" data-s="2"></span>
+        <span class="dot on" data-s="1"></span><span class="dot" data-s="2"></span><span class="dot" data-s="3"></span>
       </div>
 
       <div class="step-pane" data-pane="1">
         <h4>Шаг 1 — номер позиции</h4>
-        <p>Станет именем архива — например <b>К11</b>, <b>Л22</b>, <b>С3</b>.</p>
+        <p>Например <b>К11</b>, <b>S3</b>, <b>L22</b>. Первая буква = база (К S T I P A L).</p>
         <input type="text" id="posInput" placeholder="например К11" autocomplete="off" autocapitalize="characters">
         <div class="modal-btns">
           <button class="btn" id="posCancel">Отмена</button>
@@ -587,35 +630,81 @@ function openPosModal(){
 
       <div class="step-pane" data-pane="2" hidden>
         <h4>Шаг 2 — описание товара</h4>
-        <p>Вставь описание — оно сохранится в архиве файлом <b>описание.txt</b>. Можно оставить пустым.</p>
-        <textarea id="descInput" rows="6" placeholder="Бренд, модель, состояние, размер, цена…"></textarea>
+        <p>Сохранится в архиве файлом <b>описание.txt</b> и в облаке. Можно пропустить.</p>
+        <textarea id="descInput" rows="5" placeholder="Бренд, модель, состояние, размер, цена…"></textarea>
         <div class="modal-btns">
           <button class="btn" id="backStep1">← Назад</button>
-          <button class="btn primary" id="posOk">Скачать архив</button>
+          <button class="btn primary" id="toStep3">Дальше →</button>
+        </div>
+      </div>
+
+      <div class="step-pane" data-pane="3" hidden>
+        <h4>Шаг 3 — куда сохранить</h4>
+        <p>Архив на телефон или загрузка в облако (каталог).</p>
+        <div class="dest">
+          <button class="dest-btn" data-act="phone"><b>📥 Архив на телефон</b><small>обработанные фото + описание в .zip</small></button>
+          <button class="dest-btn" data-act="cloud-proc"><b>☁ В облако — обработанные</b><small>для каталога</small></button>
+          <button class="dest-btn" data-act="cloud-orig"><b>☁ В облако — оригиналы</b><small>необработанные снимки</small></button>
+          <button class="dest-btn" data-act="cloud-both"><b>☁ В облако — и то и то</b><small>оригиналы + обработанные</small></button>
+        </div>
+        <div class="modal-btns">
+          <button class="btn" id="backStep2">← Назад</button>
+          <button class="btn" id="cloudCfg">Настроить облако</button>
         </div>
       </div>
     </div>`;
   document.body.appendChild(back);
-  const inp=back.querySelector('#posInput');
-  const desc=back.querySelector('#descInput');
-  const pane1=back.querySelector('[data-pane="1"]');
-  const pane2=back.querySelector('[data-pane="2"]');
+  const inp=back.querySelector('#posInput'),desc=back.querySelector('#descInput');
+  const panes=[1,2,3].map(n=>back.querySelector(`[data-pane="${n}"]`));
   const dots=back.querySelectorAll('.dot');
   setTimeout(()=>inp.focus(),50);
   const close=()=>back.remove();
-
   function showStep(n){
-    pane1.hidden=n!==1;pane2.hidden=n!==2;
+    panes.forEach((p,i)=>p.hidden=(i+1)!==n);
     dots.forEach(d=>d.classList.toggle('on',+d.dataset.s<=n));
-    setTimeout(()=>(n===1?inp:desc).focus(),50);
+    if(n<3)setTimeout(()=>(n===1?inp:desc).focus(),50);
   }
   back.querySelector('#posCancel').onclick=close;
-  back.querySelector('#toStep2').onclick=()=>showStep(2);
+  back.querySelector('#toStep2').onclick=()=>{if(!sanitizePos(inp.value)){inp.style.borderColor='var(--red)';return;}showStep(2);};
   back.querySelector('#backStep1').onclick=()=>showStep(1);
+  back.querySelector('#toStep3').onclick=()=>showStep(3);
+  back.querySelector('#backStep2').onclick=()=>showStep(2);
   back.onclick=e=>{if(e.target===back)close();};
-  const go=async()=>{const v=inp.value,d=desc.value;close();await buildZip(v,d);};
-  back.querySelector('#posOk').onclick=go;
-  inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();showStep(2);}});
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();back.querySelector('#toStep2').click();}});
+
+  back.querySelectorAll('.dest-btn').forEach(b=>b.onclick=async()=>{
+    const v=inp.value,d=desc.value,act=b.dataset.act;close();
+    if(act==='phone')await buildZip(v,d);
+    else if(act==='cloud-proc')await uploadCloud(v,d,'processed');
+    else if(act==='cloud-orig')await uploadCloud(v,d,'original');
+    else if(act==='cloud-both')await uploadCloud(v,d,'both');
+  });
+  back.querySelector('#cloudCfg').onclick=()=>{close();openCloudConfig();};
+}
+
+/* настройка облака */
+function openCloudConfig(){
+  const back=document.createElement('div');back.className='modal-back';
+  back.innerHTML=`
+    <div class="modal">
+      <h4>Настройка облака</h4>
+      <p>Адрес Worker и пароль выдаёт владелец. Сохранятся на этом устройстве.</p>
+      <input type="text" id="cApi" placeholder="https://...workers.dev" autocomplete="off" autocapitalize="off" style="text-transform:none;text-align:left;font-size:14px">
+      <input type="password" id="cTok" placeholder="пароль" autocomplete="off" style="text-transform:none;text-align:left;font-size:14px;margin-top:8px">
+      <div class="modal-btns">
+        <button class="btn" id="cCancel">Отмена</button>
+        <button class="btn primary" id="cSave">Сохранить</button>
+      </div>
+    </div>`;
+  document.body.appendChild(back);
+  back.querySelector('#cApi').value=cloud.api;back.querySelector('#cTok').value=cloud.token;
+  const close=()=>back.remove();
+  back.querySelector('#cCancel').onclick=close;
+  back.onclick=e=>{if(e.target===back)close();};
+  back.querySelector('#cSave').onclick=()=>{
+    cloud.set(back.querySelector('#cApi').value.trim(),back.querySelector('#cTok').value.trim());
+    statusEl.textContent='Облако настроено.';close();
+  };
 }
 $('clear').onclick=()=>{items.forEach(i=>{URL.revokeObjectURL(i.srcURL);i.outURL&&URL.revokeObjectURL(i.outURL)});items=[];render();statusEl.textContent='';};
 </script>
